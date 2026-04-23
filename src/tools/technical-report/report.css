@@ -1,0 +1,402 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.tr-root {
+  font-family: system-ui, -apple-system, sans-serif;
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+  color: #1a1a1a;
+  background: #fff;
+}
+
+.tr-back-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #999;
+  text-decoration: none;
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(4px);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #e2e2e2;
+}
+.tr-back-link:hover { color: #555; }
+
+.tr-root h1 {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #000;
+  padding-bottom: 0.5rem;
+}
+
+.tr-root h2 {
+  font-size: 1.1rem;
+  margin: 1.5rem 0 0.75rem;
+  text-transform: uppercase;
+  background: #f0f0f0;
+  padding: 0.4rem 0.6rem;
+  border-left: 4px solid #333;
+}
+
+.tr-root table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.tr-root th, .tr-root td {
+  border: 1px solid #999;
+  padding: 0.4rem 0.5rem;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.tr-root th {
+  background: #f5f5f5;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tr-root input[type="text"],
+.tr-root input[type="number"],
+.tr-root input[type="date"],
+.tr-root textarea,
+.tr-root select {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  padding: 0.3rem 0.2rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+  background: transparent;
+  outline: none;
+}
+
+.currency-input-wrapper {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+}
+
+.currency-input-wrapper input[type="text"] {
+  border-bottom: none;
+  flex: 1;
+}
+
+.currency-prefix {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #666;
+  padding-right: 0.3rem;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.tr-root input:focus,
+.tr-root textarea:focus,
+.tr-root select:focus {
+  border-bottom-color: #333;
+}
+
+.photo-upload-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.photo-slot {
+  width: 120px;
+  text-align: center;
+}
+
+.photo-slot label {
+  display: block;
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.photo-preview {
+  width: 120px;
+  height: 90px;
+  border: 1px dashed #999;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  background: #fafafa;
+  position: relative;
+  transition: border-color 0.2s;
+}
+
+.photo-preview:hover {
+  border-color: #555;
+}
+
+.photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-preview .placeholder {
+  font-size: 1.5rem;
+  color: #bbb;
+}
+
+.photo-preview .remove-btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.65rem;
+  cursor: pointer;
+  display: none;
+  line-height: 1;
+}
+
+.photo-preview:hover .remove-btn {
+  display: block;
+}
+
+.damage-row td:first-child {
+  width: 30%;
+}
+
+.damage-row .photo-cell {
+  width: 40%;
+}
+
+.tyre-table td:first-child {
+  width: 20%;
+}
+
+.tyre-table th,
+.tyre-table td {
+  text-align: center;
+}
+
+.tyre-table td:first-child {
+  text-align: left;
+}
+
+.conclusion-section {
+  margin-bottom: 1rem;
+}
+
+.conclusion-list {
+  list-style: decimal;
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.conclusion-list li {
+  padding: 0.2rem 0;
+  font-size: 0.85rem;
+}
+
+.conclusion-list li textarea {
+  resize: vertical;
+  min-height: 2.5rem;
+}
+
+.add-conclusion-btn {
+  background: none;
+  border: 1px dashed #999;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border-radius: 3px;
+  color: #666;
+}
+
+.add-conclusion-btn:hover {
+  border-color: #333;
+  color: #333;
+}
+
+.print-pdf-btn {
+  display: block;
+  margin: 1.5rem 0;
+  padding: 0.6rem 1.5rem;
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.print-pdf-btn:hover {
+  background: #555;
+}
+
+.signature-section {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.signature-box {
+  flex: 1;
+  min-width: 200px;
+  text-align: center;
+}
+
+.signature-box .sig-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.sig-upload-area {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+}
+
+.sig-preview-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.sig-image {
+  max-width: 220px;
+  max-height: 80px;
+  object-fit: contain;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.sig-preview-wrapper .remove-btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.65rem;
+  cursor: pointer;
+  display: none;
+  line-height: 1;
+}
+
+.sig-preview-wrapper:hover .remove-btn {
+  display: block;
+}
+
+.sig-placeholder {
+  width: 220px;
+  height: 80px;
+  border: 1px dashed #999;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #999;
+  background: #fafafa;
+}
+
+.signature-box .sig-line {
+  border-top: 1px solid #000;
+  margin-top: 0.25rem;
+  padding-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.sig-date-input {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  background: transparent;
+  font-size: 0.75rem;
+  font-family: inherit;
+  color: inherit;
+  outline: none;
+  padding: 0;
+}
+
+.section-break {
+  break-inside: avoid;
+}
+
+@media print {
+  .tr-root {
+    padding: 0.5rem;
+  }
+  .tr-back-link,
+  .add-conclusion-btn,
+  .clear-sig-btn,
+  .photo-preview .remove-btn,
+  .sig-preview-wrapper .remove-btn,
+  .sig-placeholder,
+  .no-print {
+    display: none !important;
+  }
+
+  .section-break {
+    break-inside: avoid;
+  }
+
+  .tr-root h2 {
+    break-after: avoid;
+    break-inside: avoid;
+  }
+
+  .tr-root table {
+    break-inside: avoid;
+  }
+
+  .tr-root tr {
+    break-inside: avoid;
+  }
+
+  .photo-upload-area {
+    break-inside: avoid;
+  }
+
+  .signature-section {
+    break-inside: avoid;
+  }
+
+  .signature-box {
+    break-inside: avoid;
+  }
+
+  .sig-date-input::-webkit-calendar-picker-indicator {
+    display: none;
+  }
+
+  .conclusion-section {
+    break-inside: avoid;
+  }
+}

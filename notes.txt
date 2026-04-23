@@ -1,0 +1,6 @@
+market value, sum insured, pav currency format, comma seperated, no cents
+remove in/out from front wheel
+conclusion to be area text. if supported need numbered bullet list.
+make the signature a image so to be uploaded.
+add media breaks in print mode so it doesn't break things in half.
+
