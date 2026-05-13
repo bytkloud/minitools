@@ -9,9 +9,9 @@ const tools = [
     icon: Calculator,
   },
   {
-    name: 'Total Loss Report',
+    name: 'Technical Report',
     description: 'Vehicle total loss report form with photos and signatures',
-    path: '/total-loss-report',
+    path: '/technical-report',
     icon: FileText,
   },
   {
