@@ -3,7 +3,8 @@ import { lazy, Suspense } from 'react'
 import Home from './pages/Home'
 
 const InsuranceCalc = lazy(() => import('./tools/insurance-calc'))
-const TechnicalReport = lazy(() => import('./tools/technical-report'))
+const TotalLossReport = lazy(() => import('./tools/total-loss-report'))
+const TechnicalInvestigationReport = lazy(() => import('./tools/technical-investigation-report'))
 
 export default function App() {
   return (
@@ -12,7 +13,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/insurance-calc" element={<InsuranceCalc />} />
-          <Route path="/technical-report" element={<TechnicalReport />} />
+          <Route path="/total-loss-report" element={<TotalLossReport />} />
+          <Route path="/technical-investigation-report" element={<TechnicalInvestigationReport />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

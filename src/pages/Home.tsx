@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Calculator, FileText } from 'lucide-react'
+import { Calculator, FileText, Search } from 'lucide-react'
 
 const tools = [
   {
@@ -9,10 +9,16 @@ const tools = [
     icon: Calculator,
   },
   {
-    name: 'Technical Report',
-    description: 'Vehicle technical report form with photos and signatures',
-    path: '/technical-report',
+    name: 'Total Loss Report',
+    description: 'Vehicle total loss report form with photos and signatures',
+    path: '/total-loss-report',
     icon: FileText,
+  },
+  {
+    name: 'Technical Investigation Report',
+    description: 'Vehicle technical investigation report form',
+    path: '/technical-investigation-report',
+    icon: Search,
   },
 ]
 

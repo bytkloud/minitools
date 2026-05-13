@@ -155,7 +155,7 @@ function CurrencyInput({ field }: { field: string }) {
   )
 }
 
-export default function TechnicalReportForm() {
+export default function TotalLossReportForm() {
   const [conclusion, setConclusion] = useState('')
   const [damageRows, setDamageRows] = useState<number[]>([0])
   const [damageText, setDamageText] = useState<Record<number, string>>({})
