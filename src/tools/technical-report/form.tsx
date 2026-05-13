@@ -1,12 +1,5 @@
 import { useState, useRef } from 'react'
 
-const DAMAGES = [
-  { key: 'damageHood', label: '1. Hood' },
-  { key: 'damageRhsBody', label: '2. RHS Body' },
-  { key: 'damageLhsBody', label: '3. LHS Body' },
-  { key: 'damageFacePanel', label: '4. Face Panel' },
-  { key: 'damageRearDoor', label: '5. Rear Door' },
-]
 
 const TYRES = [
   { key: 'FrontRhs', label: 'Front RHS' },
@@ -23,11 +16,6 @@ const SIGNATURES = [
   { key: 'managerMotor', label: 'Manager Motor Engineer' },
 ]
 
-const CURRENCY_FIELDS = new Set([
-  'sumInsured', 'pav',
-  'marketWebValue', 'valuationOfficerValue', 'areaEngineerValue', 'zonalEngineerValue',
-  'salvageValue', 'wreckValue',
-])
 
 const formatCurrencyDisplay = (val: string) => {
   if (!val) return ''
@@ -40,61 +28,60 @@ const parseCurrencyInput = (val: string) => {
   return val.replace(/,/g, '')
 }
 
-interface PhotoSlot {
-  id: number
-  src: string | null
-}
 
-function PhotoUploadArea({ fieldKey }: { fieldKey: string }) {
-  const [slots, setSlots] = useState<PhotoSlot[]>([{ id: 0, src: null }])
-  const nextId = useRef(1)
-  const inputRefs = useRef<Record<number, HTMLInputElement | null>>({})
+function QuadrantPhotoUpload({ fieldKey }: { fieldKey: string }) {
+  const [photos, setPhotos] = useState<(string | null)[]>([null, null, null, null])
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([null, null, null, null])
 
-  const handleFileChange = (slotId: number, file: File) => {
+  const handleFile = (idx: number, file: File) => {
     const reader = new FileReader()
     reader.onload = (ev) => {
-      const src = ev.target?.result as string
-      setSlots(prev => {
-        const updated = prev.map(s => s.id === slotId ? { ...s, src } : s)
-        const newId = nextId.current++
-        return [...updated, { id: newId, src: null }]
+      setPhotos(prev => {
+        const next = [...prev]
+        next[idx] = ev.target?.result as string
+        return next
       })
     }
     reader.readAsDataURL(file)
   }
 
-  const handleRemove = (slotId: number) => {
-    setSlots(prev => prev.filter(s => s.id !== slotId))
-  }
-
-  const handleClick = (slotId: number) => {
-    inputRefs.current[slotId]?.click()
+  const handleRemove = (idx: number) => {
+    setPhotos(prev => {
+      const next = [...prev]
+      next[idx] = null
+      return next
+    })
   }
 
   return (
-    <div className="photo-upload-area">
-      {slots.map((slot, idx) => (
-        <div key={slot.id} className={`photo-slot${!slot.src ? ' no-print' : ''}`}>
-          <label>Photo {idx + 1}</label>
-          <div className="photo-preview" onClick={() => !slot.src && handleClick(slot.id)}>
-            {slot.src ? (
-              <>
-                <img src={slot.src} alt="" />
-                <button className="remove-btn no-print" onClick={(e) => { e.stopPropagation(); handleRemove(slot.id) }}>&times;</button>
-              </>
-            ) : (
-              <span className="placeholder">+</span>
-            )}
-          </div>
+    <div className="quadrant-grid">
+      {photos.map((src, idx) => (
+        <div
+          key={idx}
+          className={`quadrant-cell${!src ? ' no-print' : ''}`}
+          onClick={() => !src && inputRefs.current[idx]?.click()}
+        >
+          {src ? (
+            <>
+              <img src={src} alt={`Photo ${idx + 1}`} />
+              <button
+                className="remove-btn no-print"
+                onClick={(e) => { e.stopPropagation(); handleRemove(idx) }}
+              >&times;</button>
+            </>
+          ) : (
+            <span className="placeholder">+ Photo {idx + 1}</span>
+          )}
           <input
-            ref={el => { inputRefs.current[slot.id] = el }}
+            ref={el => { inputRefs.current[idx] = el }}
             type="file"
             accept="image/*"
             capture="environment"
             hidden
             onChange={(e) => {
               const file = e.target.files?.[0]
-              if (file) handleFileChange(slot.id, file)
+              if (file) handleFile(idx, file)
+              e.target.value = ''
             }}
           />
         </div>
@@ -170,10 +157,17 @@ function CurrencyInput({ field }: { field: string }) {
 
 export default function TechnicalReportForm() {
   const [conclusion, setConclusion] = useState('')
+  const [damageRows, setDamageRows] = useState<number[]>([0])
+  const [damageText, setDamageText] = useState<Record<number, string>>({})
+  const nextDamageId = useRef(1)
+
+  const addDamageRow = () => {
+    setDamageRows(prev => [...prev, nextDamageId.current++])
+  }
 
   return (
     <>
-      <h1>Technical Report</h1>
+      <h1>Total loss report</h1>
 
       <div className="section-break">
         <h2>Vehicle Details</h2>
@@ -232,20 +226,24 @@ export default function TechnicalReportForm() {
 
       <div className="section-break">
         <h2>Damages</h2>
-        <table>
-          <thead>
-            <tr><th>Part</th><th>Description of Damage</th><th>Photos</th></tr>
-          </thead>
-          <tbody>
-            {DAMAGES.map(({ key, label }) => (
-              <tr className="damage-row" key={key}>
-                <td>{label}</td>
-                <td><input type="text" data-field={key} /></td>
-                <td className="photo-cell"><PhotoUploadArea fieldKey={key} /></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {damageRows.map((id, i) => (
+          <div className="damage-block" key={id}>
+            <div className="damage-desc">
+              <span className="damage-num">{i + 1}.</span>
+              <textarea
+                className="no-print"
+                data-field={`damage_${id}`}
+                placeholder="Description of damage"
+                rows={2}
+                value={damageText[id] ?? ''}
+                onChange={(e) => setDamageText(prev => ({ ...prev, [id]: e.target.value }))}
+              />
+              <div className="damage-desc-print print-only">{damageText[id]}</div>
+            </div>
+            <QuadrantPhotoUpload fieldKey={`damage_${id}`} />
+          </div>
+        ))}
+        <button className="add-row-btn no-print" onClick={addDamageRow}>+ Add Row</button>
       </div>
 
       <div className="section-break">
@@ -255,7 +253,6 @@ export default function TechnicalReportForm() {
             <tr>
               <th>Position</th>
               <th>Condition</th>
-              <th>Photos</th>
             </tr>
           </thead>
           <tbody>
@@ -263,7 +260,6 @@ export default function TechnicalReportForm() {
               <tr key={key}>
                 <td>{label}</td>
                 <td><input type="text" data-field={`tyre${key}Cond`} /></td>
-                <td><PhotoUploadArea fieldKey={`tyre${key}`} /></td>
               </tr>
             ))}
           </tbody>
