@@ -1,9 +1,19 @@
 import { useState, useRef } from 'react'
+import { downloadDocx } from './docx-builder'
+import { normalizeImage } from '../../utils/normalizeImage'
+import type { ReportData, SignatureData } from './report-types'
 
 const SIGNATURES = [
-  { key: 'areaEngineer', label: 'Area Engineer' },
-  { key: 'zonalEngineer', label: 'Zonal Engineer' },
-  { key: 'managerMotor', label: 'Manager Motor Engineer' },
+  { key: 'areaEngineer' as const, label: 'Area Engineer' },
+  { key: 'zonalEngineer' as const, label: 'Zonal Engineer' },
+  { key: 'managerMotor' as const, label: 'Manager Motor Engineer' },
+]
+
+const VEHICLE_FIELDS = [
+  { field: 'vehicleNo' as const, label: 'Vehicle No' },
+  { field: 'moiNo' as const, label: 'MOI No' },
+  { field: 'makeModel' as const, label: 'Make / Model' },
+  { field: 'acr' as const, label: 'ACR' },
 ]
 
 function ObservationImageSlot({ idx, onChange, onRemove, src }: {
@@ -40,24 +50,25 @@ function ObservationImageSlot({ idx, onChange, onRemove, src }: {
   )
 }
 
-function SignatureUpload({ sigKey, label }: { sigKey: string; label: string }) {
-  const [src, setSrc] = useState<string | null>(null)
+function SignatureUpload({ label, value, onChange }: {
+  label: string
+  value: SignatureData
+  onChange: (data: SignatureData) => void
+}) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleFile = (file: File) => {
-    const reader = new FileReader()
-    reader.onload = (ev) => setSrc(ev.target?.result as string)
-    reader.readAsDataURL(file)
+    normalizeImage(file).then(src => onChange({ ...value, imageSrc: src }))
   }
 
   return (
     <div className="signature-box">
       <div className="sig-label">{label}</div>
-      <div className="sig-upload-area" onClick={() => !src && inputRef.current?.click()}>
-        {src ? (
+      <div className="sig-upload-area" onClick={() => !value.imageSrc && inputRef.current?.click()}>
+        {value.imageSrc ? (
           <div className="sig-preview-wrapper">
-            <img src={src} alt="Signature" className="sig-image" />
-            <button className="remove-btn no-print" onClick={(e) => { e.stopPropagation(); setSrc(null) }}>&times;</button>
+            <img src={value.imageSrc} alt="Signature" className="sig-image" />
+            <button className="remove-btn no-print" onClick={(e) => { e.stopPropagation(); onChange({ ...value, imageSrc: null }) }}>&times;</button>
           </div>
         ) : (
           <div className="sig-placeholder no-print">Click to upload signature</div>
@@ -75,18 +86,29 @@ function SignatureUpload({ sigKey, label }: { sigKey: string; label: string }) {
       />
       <div className="sig-line">
         <span>Date:&nbsp;</span>
-        <input type="date" className="sig-date-input" />
+        <input
+          type="date"
+          className="sig-date-input"
+          value={value.date}
+          onChange={(e) => onChange({ ...value, date: e.target.value })}
+        />
       </div>
     </div>
   )
 }
 
 export default function TechnicalInvestigationReportForm() {
+  const [vehicleFields, setVehicleFields] = useState({ vehicleNo: '', moiNo: '', makeModel: '', acr: '' })
   const [accidentDescription, setAccidentDescription] = useState('')
   const [recommendation, setRecommendation] = useState('')
   const [observationRows, setObservationRows] = useState<number[]>([0])
   const [observationText, setObservationText] = useState<Record<number, string>>({})
   const [observationPhotos, setObservationPhotos] = useState<Record<number, [string | null, string | null]>>({})
+  const [signatures, setSignatures] = useState<ReportData['signatures']>({
+    areaEngineer: { imageSrc: null, date: '' },
+    zonalEngineer: { imageSrc: null, date: '' },
+    managerMotor: { imageSrc: null, date: '' },
+  })
   const nextObsId = useRef(1)
 
   const addObservationRow = () => {
@@ -94,16 +116,14 @@ export default function TechnicalInvestigationReportForm() {
   }
 
   const handleObsPhoto = (id: number, idx: number, file: File) => {
-    const reader = new FileReader()
-    reader.onload = (ev) => {
+    normalizeImage(file).then(src => {
       setObservationPhotos(prev => {
         const current = prev[id] ?? [null, null]
         const updated: [string | null, string | null] = [...current]
-        updated[idx] = ev.target?.result as string
+        updated[idx] = src
         return { ...prev, [id]: updated }
       })
-    }
-    reader.readAsDataURL(file)
+    })
   }
 
   const removeObsPhoto = (id: number, idx: number) => {
@@ -117,17 +137,23 @@ export default function TechnicalInvestigationReportForm() {
 
   const removeObservationRow = (id: number) => {
     setObservationRows(prev => prev.filter(rowId => rowId !== id))
-    setObservationText(prev => {
-      const next = { ...prev }
-      delete next[id]
-      return next
-    })
-    setObservationPhotos(prev => {
-      const next = { ...prev }
-      delete next[id]
-      return next
-    })
+    setObservationText(prev => { const next = { ...prev }; delete next[id]; return next })
+    setObservationPhotos(prev => { const next = { ...prev }; delete next[id]; return next })
   }
+
+  const buildReportData = (): ReportData => ({
+    ...vehicleFields,
+    accidentDescription,
+    recommendation,
+    observations: observationRows.map(id => ({
+      id,
+      text: observationText[id] ?? '',
+      photos: observationPhotos[id] ?? [null, null],
+    })),
+    signatures,
+  })
+
+  const handleDownloadDocx = () => downloadDocx(buildReportData())
 
   return (
     <>
@@ -137,15 +163,16 @@ export default function TechnicalInvestigationReportForm() {
         <h2>Vehicle Details</h2>
         <table>
           <tbody>
-            {([
-              ['Vehicle No', 'vehicleNo'],
-              ['MOI No', 'moiNo'],
-              ['Make / Model', 'makeModel'],
-              ['ACR', 'acr'],
-            ] as const).map(([label, field]) => (
+            {VEHICLE_FIELDS.map(({ field, label }) => (
               <tr key={field}>
                 <th>{label}</th>
-                <td><input type="text" data-field={field} /></td>
+                <td>
+                  <input
+                    type="text"
+                    value={vehicleFields[field]}
+                    onChange={(e) => setVehicleFields(prev => ({ ...prev, [field]: e.target.value }))}
+                  />
+                </td>
               </tr>
             ))}
           </tbody>
@@ -174,7 +201,6 @@ export default function TechnicalInvestigationReportForm() {
               <input
                 type="text"
                 className="obs-text-input"
-                data-field={`observation_${id}`}
                 placeholder="Observation / Comment"
                 value={observationText[id] ?? ''}
                 onChange={(e) => setObservationText(prev => ({ ...prev, [id]: e.target.value }))}
@@ -215,12 +241,20 @@ export default function TechnicalInvestigationReportForm() {
         <h2>Signatures</h2>
         <div className="signature-section">
           {SIGNATURES.map(({ key, label }) => (
-            <SignatureUpload key={key} sigKey={key} label={label} />
+            <SignatureUpload
+              key={key}
+              label={label}
+              value={signatures[key]}
+              onChange={(data) => setSignatures(prev => ({ ...prev, [key]: data }))}
+            />
           ))}
         </div>
       </div>
 
-      <button className="print-pdf-btn no-print" onClick={() => window.print()}>Print to PDF</button>
+      <div className="no-print action-buttons">
+        <button className="print-pdf-btn" onClick={() => window.print()}>Print to PDF</button>
+        <button className="print-pdf-btn" onClick={handleDownloadDocx}>Download DOCX</button>
+      </div>
     </>
   )
 }
