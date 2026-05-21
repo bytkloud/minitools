@@ -5,6 +5,7 @@ import Home from './pages/Home'
 const InsuranceCalc = lazy(() => import('./tools/insurance-calc'))
 const TechnicalReport = lazy(() => import('./tools/technical-report'))
 const TechnicalInvestigationReport = lazy(() => import('./tools/technical-investigation-report'))
+const Mofa = lazy(() => import('./tools/mofa'))
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
           <Route path="/insurance-calc" element={<InsuranceCalc />} />
           <Route path="/technical-report" element={<TechnicalReport />} />
           <Route path="/technical-investigation-report" element={<TechnicalInvestigationReport />} />
+          <Route path="/mofa" element={<Mofa />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

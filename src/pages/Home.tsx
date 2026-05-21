@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Calculator, FileText, Search } from 'lucide-react'
+import { Calculator, FileText, Search, ClipboardCheck } from 'lucide-react'
 
 const tools = [
   {
@@ -19,6 +19,12 @@ const tools = [
     description: 'Vehicle technical investigation report form',
     path: '/technical-investigation-report',
     icon: Search,
+  },
+  {
+    name: 'MOFA',
+    description: 'Motor officer approval request — estimate, full & final, cash in lieu, or wreck basis',
+    path: '/mofa',
+    icon: ClipboardCheck,
   },
 ]
 
