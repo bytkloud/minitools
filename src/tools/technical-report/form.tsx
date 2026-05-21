@@ -12,6 +12,37 @@ const TYRES = [
   { key: 'RearLhsOut'as const, label: 'Rear LHS – Out' },
 ]
 
+const THEREFORE = "Therefore, considering all technical circumstances, my technical opinion is to treat this claim on a total loss basis."
+
+const CONCLUSIONS = [
+  {
+    title: 'Homogeneous Body Structure',
+    body: "The homogeneous body structure has gone out of shape and specification due to direct and indirect impacts applied to the vehicle body. It is not advisable to carry out any professional collision repair techniques on the vehicle body. Even if repaired, it will fail to regain the manufacturer's original technical specifications and quality standards. It will also lose directional stability and static & dynamic equilibrium.",
+  },
+  {
+    title: 'Chassis',
+    body: "Several areas of the chassis have been bent. Therefore, based on R.M.V. regulations and professional collision repair techniques, we are not in a position to recommend any repair work on the chassis. Furthermore, if any repair work is carried out on the chassis, it may result in failure of directional stability.",
+  },
+  { title: 'Sum', body: '' }, // body built dynamically via buildSumBody
+  {
+    title: 'Fire',
+    body: "The complete vehicle, along with all components, has gone out of shape, and the manufacturer's specifications have failed due to fire damage. Certain components of the vehicle have reached their melting point. The entire vehicle is not in a repairable condition based on professional collision repair standards.",
+  },
+  {
+    title: 'Flood',
+    body: "All electrical components and microprocessors are in a wet condition due to flooding. Any repair process cannot be recommended due to the risk of short circuits. Even if repairs are carried out, the vehicle will most probably fail to regain the manufacturer's original technical specifications and quality standards. In addition, the repair cost would not be economically viable.",
+  },
+]
+
+const SUM_IDX = 2
+
+function buildSumBody(rawAmount: string) {
+  const formatted = rawAmount
+    ? 'Rupees ' + new Intl.NumberFormat('en-LK', { minimumFractionDigits: 2 }).format(Number(rawAmount))
+    : 'Rupees ___________'
+  return `The repair cost would be in the region of ${formatted}. Considering the sum insured, pre-accident value, repair cost, and salvage value, no repair process can be approved.`
+}
+
 const SIGNATURES = [
   { key: 'areaEngineer' as const, label: 'Area Engineer' },
   { key: 'zonalEngineer'as const, label: 'Zonal Engineer' },
@@ -174,7 +205,11 @@ export default function TotalLossReportForm() {
   const [damages, setDamages] = useState<DamageData[]>([
     { id: 0, text: '', photos: [null, null, null, null] },
   ])
-  const [conclusion, setConclusion] = useState('')
+  const [activeConclusions, setActiveConclusions] = useState<boolean[]>(
+    new Array(CONCLUSIONS.length).fill(false)
+  )
+  const [sumRepairCost, setSumRepairCost] = useState('')
+  const [customConclusion, setCustomConclusion] = useState('')
   const [signatures, setSignatures] = useState<ReportData['signatures']>({
     areaEngineer: { imageSrc: null, date: '' },
     zonalEngineer: { imageSrc: null, date: '' },
@@ -203,12 +238,23 @@ export default function TotalLossReportForm() {
       return { ...d, photos }
     }))
 
+  const toggleConclusion = (idx: number) =>
+    setActiveConclusions(prev => prev.map((v, i) => i === idx ? !v : v))
+
   const buildReportData = (): ReportData => ({
     ...fields,
     ...currency,
     damages,
     tyres,
-    conclusion,
+    conclusions: [
+      ...CONCLUSIONS
+        .map((c, i) => {
+          if (!activeConclusions[i]) return null
+          return i === SUM_IDX ? buildSumBody(sumRepairCost) : c.body
+        })
+        .filter((c): c is string => c !== null),
+      ...(customConclusion.trim() ? [customConclusion.trim()] : []),
+    ],
     signatures,
   })
 
@@ -329,12 +375,53 @@ export default function TotalLossReportForm() {
 
       <div className="section-break">
         <h2>Conclusion</h2>
-        <textarea
-          className="conclusion-textarea"
-          rows={6}
-          value={conclusion}
-          onChange={(e) => setConclusion(e.target.value)}
-        />
+        {CONCLUSIONS.map((c, i) => {
+          const body = i === SUM_IDX ? buildSumBody(sumRepairCost) : c.body
+          return (
+            <div key={i} className="conclusion-item">
+              <div className={`conclusion-option no-print${activeConclusions[i] ? ' active' : ''}`}>
+                <input
+                  type="checkbox"
+                  checked={activeConclusions[i]}
+                  onChange={() => toggleConclusion(i)}
+                />
+                <div className="conclusion-option-content">
+                  <div className="conclusion-option-title" onClick={() => toggleConclusion(i)}>
+                    {i + 1}. {c.title}
+                  </div>
+                  {i === SUM_IDX && (
+                    <div className="conclusion-sum-input" onClick={e => e.stopPropagation()}>
+                      <span className="conclusion-sum-label">Repair cost</span>
+                      <CurrencyInput onChange={setSumRepairCost} />
+                    </div>
+                  )}
+                  <div className="conclusion-option-body">{body}</div>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+        <div className="conclusion-custom no-print">
+          <textarea
+            placeholder="Additional notes (optional)…"
+            rows={3}
+            value={customConclusion}
+            onChange={e => setCustomConclusion(e.target.value)}
+          />
+        </div>
+        {(activeConclusions.some(Boolean) || customConclusion.trim()) && (
+          <div className="print-only">
+            <ul className="conclusion-bullets">
+              {CONCLUSIONS.map((c, i) => {
+                if (!activeConclusions[i]) return null
+                const body = i === SUM_IDX ? buildSumBody(sumRepairCost) : c.body
+                return <li key={i}>{body}</li>
+              })}
+              {customConclusion.trim() && <li>{customConclusion.trim()}</li>}
+            </ul>
+            <p className="conclusion-therefore">{THEREFORE}</p>
+          </div>
+        )}
       </div>
 
       <div className="section-break">

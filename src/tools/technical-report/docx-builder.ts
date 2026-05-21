@@ -344,7 +344,12 @@ export async function downloadDocx(
         buildTyreTable(data.tyres),
 
         sectionHeading('Conclusion'),
-        bodyParagraph(data.conclusion),
+        ...data.conclusions.map(text => new Paragraph({
+          children: [run(text, { size: 20 })],
+          bullet: { level: 0 },
+          spacing: { line: 360, after: 80 },
+        })),
+        ...(data.conclusions.length > 0 ? [bodyParagraph('Therefore, considering all technical circumstances, my technical opinion is to treat this claim on a total loss basis.')] : []),
 
         sectionHeading('Signatures'),
         buildSignaturesTable(data.signatures),

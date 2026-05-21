@@ -33,7 +33,7 @@ export interface ReportData {
     RearLhsIn: string
     RearLhsOut: string
   }
-  conclusion: string
+  conclusions: string[]
   signatures: {
     areaEngineer: SignatureData
     zonalEngineer: SignatureData
