@@ -36,9 +36,12 @@ function CurrencyInput({ onChange }: { onChange: (raw: string) => void }) {
   const [display, setDisplay] = useState('')
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/,/g, '')
-    if (raw && isNaN(Number(raw))) return
+    if (raw && !/^\d*\.?\d{0,2}$/.test(raw)) return
     onChange(raw)
-    setDisplay(raw ? new Intl.NumberFormat('en-LK').format(Number(raw)) : '')
+    if (!raw) { setDisplay(''); return }
+    const [intPart, decPart] = raw.split('.')
+    const formattedInt = intPart ? new Intl.NumberFormat('en-LK').format(Number(intPart)) : '0'
+    setDisplay(decPart !== undefined ? formattedInt + '.' + decPart : formattedInt)
   }
   return (
     <span className="currency-input-wrapper">
@@ -367,18 +370,22 @@ export default function MofaForm() {
                 )}
               </td>
             </tr>
-            <tr>
-              <th>Payable Amount</th>
-              <td>
-                <CurrencyInput onChange={setPayableAmount} />
-              </td>
-            </tr>
-            <tr>
-              <th>Offer Amount</th>
-              <td>
-                <CurrencyInput onChange={setOfferAmount} />
-              </td>
-            </tr>
+            {settlementBasis !== 'Estimate Basis' && (
+              <tr>
+                <th>Payable Amount</th>
+                <td>
+                  <CurrencyInput onChange={setPayableAmount} />
+                </td>
+              </tr>
+            )}
+            {settlementBasis !== 'Estimate Basis' && (
+              <tr>
+                <th>Offer Amount</th>
+                <td>
+                  <CurrencyInput onChange={setOfferAmount} />
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
