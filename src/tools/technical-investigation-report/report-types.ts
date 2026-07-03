@@ -1,5 +1,6 @@
 export interface SignatureData {
   imageSrc: string | null
+  name: string
   date: string
 }
 

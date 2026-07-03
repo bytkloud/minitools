@@ -350,7 +350,8 @@
   gap: 2px;
 }
 
-.sig-date-input {
+.sig-date-input,
+.sig-name-input {
   flex: 1;
   border: none;
   border-bottom: 1px solid #ccc;
@@ -360,6 +361,12 @@
   color: inherit;
   outline: none;
   padding: 0;
+}
+
+.signature-box .sig-line.sig-line-plain {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0.15rem;
 }
 
 .section-break {

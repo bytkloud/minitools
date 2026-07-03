@@ -123,6 +123,18 @@
   width: 40%;
 }
 
+/* Tyre report table */
+.mofa-root .tyre-table th,
+.mofa-root .tyre-table td {
+  text-align: center;
+}
+
+.mofa-root .tyre-table th:first-child,
+.mofa-root .tyre-table td:first-child {
+  width: 30%;
+  text-align: left;
+}
+
 /* Inputs */
 .mofa-root input[type='text'],
 .mofa-root input[type='number'],
@@ -216,6 +228,70 @@
   color: #bbb;
   font-weight: normal;
   font-style: italic;
+}
+
+/* Offer round-off hint */
+.mofa-offer-hint {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  background: #f6faf7;
+  border: 1px solid #d7ead9;
+  border-left: 3px solid #4caf50;
+  border-radius: 5px;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.mofa-offer-hint-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.mofa-offer-hint-row + .mofa-offer-hint-row {
+  margin-top: 0.35rem;
+}
+
+.mofa-offer-hint-label {
+  color: #666;
+  font-weight: 600;
+}
+
+.mofa-offer-good {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.mofa-offer-warn {
+  color: #c62828;
+  font-weight: 600;
+}
+
+.mofa-offer-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid #b5d8b8;
+  border-radius: 999px;
+  background: #fff;
+  color: #2e7d32;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.mofa-offer-chip:hover {
+  background: #e8f5e9;
+  border-color: #4caf50;
+}
+
+.mofa-offer-chip-save {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: #888;
 }
 
 /* Options section */
@@ -461,7 +537,8 @@
   gap: 2px;
 }
 
-.sig-date-input {
+.sig-date-input,
+.sig-name-input {
   flex: 1;
   border: none;
   border-bottom: 1px solid #ccc;
@@ -471,6 +548,12 @@
   color: inherit;
   outline: none;
   padding: 0;
+}
+
+.signature-box .sig-line.sig-line-plain {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0.15rem;
 }
 
 /* Action buttons */

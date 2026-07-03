@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { downloadDocx } from './docx-builder'
 import { normalizeImage } from '../../utils/normalizeImage'
 import type { ReportData, SignatureData } from './report-types'
+import { SIGNATURE_NAMES, type SignatureKey } from '../../data/signatureNames'
 
 const SIGNATURES = [
   { key: 'areaEngineer' as const, label: 'Area Engineer' },
@@ -50,8 +51,9 @@ function ObservationImageSlot({ idx, onChange, onRemove, src }: {
   )
 }
 
-function SignatureUpload({ label, value, onChange }: {
+function SignatureUpload({ label, nameKey, value, onChange }: {
   label: string
+  nameKey: SignatureKey
   value: SignatureData
   onChange: (data: SignatureData) => void
 }) {
@@ -85,6 +87,20 @@ function SignatureUpload({ label, value, onChange }: {
         }}
       />
       <div className="sig-line">
+        <span>Name:&nbsp;</span>
+        <input
+          type="text"
+          className="sig-name-input"
+          list={`sig-names-${nameKey}`}
+          placeholder="Name"
+          value={value.name}
+          onChange={(e) => onChange({ ...value, name: e.target.value })}
+        />
+        <datalist id={`sig-names-${nameKey}`}>
+          {SIGNATURE_NAMES[nameKey].map((n) => <option key={n} value={n} />)}
+        </datalist>
+      </div>
+      <div className="sig-line sig-line-plain">
         <span>Date:&nbsp;</span>
         <input
           type="date"
@@ -105,9 +121,9 @@ export default function TechnicalInvestigationReportForm() {
   const [observationText, setObservationText] = useState<Record<number, string>>({})
   const [observationPhotos, setObservationPhotos] = useState<Record<number, [string | null, string | null]>>({})
   const [signatures, setSignatures] = useState<ReportData['signatures']>({
-    areaEngineer: { imageSrc: null, date: '' },
-    zonalEngineer: { imageSrc: null, date: '' },
-    managerMotor: { imageSrc: null, date: '' },
+    areaEngineer: { imageSrc: null, name: '', date: '' },
+    zonalEngineer: { imageSrc: null, name: '', date: '' },
+    managerMotor: { imageSrc: null, name: '', date: '' },
   })
   const nextObsId = useRef(1)
 
@@ -244,6 +260,7 @@ export default function TechnicalInvestigationReportForm() {
             <SignatureUpload
               key={key}
               label={label}
+              nameKey={key}
               value={signatures[key]}
               onChange={(data) => setSignatures(prev => ({ ...prev, [key]: data }))}
             />

@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { downloadDocx } from './docx-builder'
 import { normalizeImage } from '../../utils/normalizeImage'
 import type { DamageData, ReportData, SignatureData } from './report-types'
+import { SIGNATURE_NAMES, type SignatureKey } from '../../data/signatureNames'
 
 const TYRES = [
   { key: 'FrontRhs'  as const, label: 'Front RHS' },
@@ -44,9 +45,10 @@ function buildSumBody(rawAmount: string) {
 }
 
 const SIGNATURES = [
-  { key: 'areaEngineer' as const, label: 'Area Engineer' },
-  { key: 'zonalEngineer'as const, label: 'Zonal Engineer' },
-  { key: 'managerMotor' as const, label: 'Manager Motor Engineer' },
+  { key: 'areaEngineer'   as const, nameKey: 'areaEngineer'  as const, label: 'Area Engineer' },
+  { key: 'zonalEngineer1' as const, nameKey: 'zonalEngineer' as const, label: 'Zonal Engineer 1' },
+  { key: 'zonalEngineer2' as const, nameKey: 'zonalEngineer' as const, label: 'Zonal Engineer 2' },
+  { key: 'managerMotor'   as const, nameKey: 'managerMotor'  as const, label: 'Manager Motor Engineer' },
 ]
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -121,10 +123,14 @@ function QuadrantPhotoUpload({
 
 function SignatureUpload({
   label,
+  nameKey,
+  listId,
   value,
   onChange,
 }: {
   label: string
+  nameKey: SignatureKey
+  listId: string
   value: SignatureData
   onChange: (data: SignatureData) => void
 }) {
@@ -161,6 +167,20 @@ function SignatureUpload({
         }}
       />
       <div className="sig-line">
+        <span>Name:&nbsp;</span>
+        <input
+          type="text"
+          className="sig-name-input"
+          list={listId}
+          placeholder="Name"
+          value={value.name}
+          onChange={(e) => onChange({ ...value, name: e.target.value })}
+        />
+        <datalist id={listId}>
+          {SIGNATURE_NAMES[nameKey].map((n) => <option key={n} value={n} />)}
+        </datalist>
+      </div>
+      <div className="sig-line sig-line-plain">
         <span>Date:&nbsp;</span>
         <input
           type="date"
@@ -211,9 +231,10 @@ export default function TotalLossReportForm() {
   const [sumRepairCost, setSumRepairCost] = useState('')
   const [customConclusion, setCustomConclusion] = useState('')
   const [signatures, setSignatures] = useState<ReportData['signatures']>({
-    areaEngineer: { imageSrc: null, date: '' },
-    zonalEngineer: { imageSrc: null, date: '' },
-    managerMotor:  { imageSrc: null, date: '' },
+    areaEngineer:   { imageSrc: null, name: '', date: '' },
+    zonalEngineer1: { imageSrc: null, name: '', date: '' },
+    zonalEngineer2: { imageSrc: null, name: '', date: '' },
+    managerMotor:   { imageSrc: null, name: '', date: '' },
   })
   const nextDamageId = useRef(1)
 
@@ -427,10 +448,12 @@ export default function TotalLossReportForm() {
       <div className="section-break">
         <h2>Signatures</h2>
         <div className="signature-section">
-          {SIGNATURES.map(({ key, label }) => (
+          {SIGNATURES.map(({ key, nameKey, label }) => (
             <SignatureUpload
               key={key}
               label={label}
+              nameKey={nameKey}
+              listId={`sig-names-${key}`}
               value={signatures[key]}
               onChange={(data) => setSignatures(prev => ({ ...prev, [key]: data }))}
             />

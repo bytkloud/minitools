@@ -1,5 +1,6 @@
 export interface SignatureData {
   imageSrc: string | null
+  name: string
   date: string
 }
 
@@ -36,7 +37,8 @@ export interface ReportData {
   conclusions: string[]
   signatures: {
     areaEngineer: SignatureData
-    zonalEngineer: SignatureData
+    zonalEngineer1: SignatureData
+    zonalEngineer2: SignatureData
     managerMotor: SignatureData
   }
 }

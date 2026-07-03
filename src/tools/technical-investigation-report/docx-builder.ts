@@ -211,9 +211,21 @@ function buildSignaturesTable(sigs: ReportData['signatures']) {
           new TableCell({
             borders: BORDERS_NONE,
             children: [new Paragraph({
+              children: [run(sig.name || ' ', { bold: true, size: 20 })],
+              alignment: AlignmentType.CENTER,
+              spacing: { before: 40 },
+            })],
+          })
+        ),
+      }),
+      new TableRow({
+        children: entries.map(([, sig]) =>
+          new TableCell({
+            borders: BORDERS_NONE,
+            children: [new Paragraph({
               children: [run(`Date: ${sig.date}`, { size: 18, color: C_MUTED })],
               alignment: AlignmentType.CENTER,
-              spacing: { before: 80 },
+              spacing: { before: 40 },
             })],
           })
         ),

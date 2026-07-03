@@ -1,7 +1,8 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { normalizeImage } from '../../utils/normalizeImage'
 import { downloadDocx } from './docx-builder'
 import type { ReportData, SignatureData } from './report-types'
+import { SIGNATURE_NAMES, type SignatureKey } from '../../data/signatureNames'
 
 type Signatures = {
   areaEngineer: SignatureData
@@ -28,26 +29,114 @@ const SETTLEMENT_OPTIONS: SettlementBasis[] = [
   'Wreck to the Insure Basis',
 ]
 
+const TYRES = [
+  { key: 'FrontRhs'  as const, label: 'Front RHS' },
+  { key: 'FrontLhs'  as const, label: 'Front LHS' },
+  { key: 'RearRhsIn' as const, label: 'Rear RHS – In' },
+  { key: 'RearRhsOut'as const, label: 'Rear RHS – Out' },
+  { key: 'RearLhsIn' as const, label: 'Rear LHS – In' },
+  { key: 'RearLhsOut'as const, label: 'Rear LHS – Out' },
+]
+
 function fmtLKR(n: number): string {
   return 'LKR ' + new Intl.NumberFormat('en-LK').format(n)
 }
 
-function CurrencyInput({ onChange }: { onChange: (raw: string) => void }) {
+function formatCurrencyDisplay(raw: string): string {
+  if (!raw) return ''
+  const [intPart, decPart] = raw.split('.')
+  const formattedInt = intPart ? new Intl.NumberFormat('en-LK').format(Number(intPart)) : '0'
+  return decPart !== undefined ? formattedInt + '.' + decPart : formattedInt
+}
+
+function CurrencyInput({
+  value,
+  onChange,
+}: {
+  value?: string
+  onChange: (raw: string) => void
+}) {
   const [display, setDisplay] = useState('')
+  // Sync display when the value is driven externally (controlled usage).
+  useEffect(() => {
+    if (value !== undefined) setDisplay(formatCurrencyDisplay(value))
+  }, [value])
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/,/g, '')
     if (raw && !/^\d*\.?\d{0,2}$/.test(raw)) return
     onChange(raw)
-    if (!raw) { setDisplay(''); return }
-    const [intPart, decPart] = raw.split('.')
-    const formattedInt = intPart ? new Intl.NumberFormat('en-LK').format(Number(intPart)) : '0'
-    setDisplay(decPart !== undefined ? formattedInt + '.' + decPart : formattedInt)
+    setDisplay(formatCurrencyDisplay(raw))
   }
   return (
     <span className="currency-input-wrapper">
       <span className="currency-prefix">LKR</span>
       <input type="text" value={display} onChange={handleChange} />
     </span>
+  )
+}
+
+// Suggests rounding the offer down to a cleaner figure to save money,
+// and shows how the current offer compares to the ACR.
+function OfferHint({
+  acr,
+  offerRaw,
+  onPick,
+}: {
+  acr: number
+  offerRaw: string
+  onPick: (value: number) => void
+}) {
+  const offer = parseFloat(offerRaw) || 0
+  if (offer <= 0) return null
+
+  const diff = acr - offer // positive => offer is below ACR (a saving)
+  const steps = [1000, 5000, 10000]
+  const suggestions = steps
+    .map((s) => Math.floor(offer / s) * s)
+    .filter((v, i, arr) => v > 0 && v < offer && arr.indexOf(v) === i)
+
+  let comparison: React.ReactNode
+  if (diff > 0) {
+    comparison = (
+      <span className="mofa-offer-good">
+        LKR {new Intl.NumberFormat('en-LK').format(diff)} below ACR
+      </span>
+    )
+  } else if (diff === 0) {
+    comparison = <span className="mofa-offer-warn">Offer equals the ACR</span>
+  } else {
+    comparison = (
+      <span className="mofa-offer-warn">
+        LKR {new Intl.NumberFormat('en-LK').format(-diff)} above ACR
+      </span>
+    )
+  }
+
+  return (
+    <div className="mofa-offer-hint no-print">
+      <div className="mofa-offer-hint-row">
+        <span className="mofa-offer-hint-label">vs ACR:</span> {comparison}
+      </div>
+      {suggestions.length > 0 && (
+        <div className="mofa-offer-hint-row">
+          <span className="mofa-offer-hint-label">💡 Round down &amp; save:</span>
+          {suggestions.map((v) => (
+            <button
+              key={v}
+              type="button"
+              className="mofa-offer-chip"
+              onClick={() => onPick(v)}
+              title={`Set offer to LKR ${new Intl.NumberFormat('en-LK').format(v)} (save LKR ${new Intl.NumberFormat('en-LK').format(offer - v)})`}
+            >
+              {new Intl.NumberFormat('en-LK').format(v)}
+              <span className="mofa-offer-chip-save">
+                −{new Intl.NumberFormat('en-LK').format(offer - v)}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -108,10 +197,12 @@ function YesNo({
 
 function SignatureUpload({
   label,
+  nameKey,
   value,
   onChange,
 }: {
   label: string
+  nameKey: SignatureKey
   value: SignatureData
   onChange: (data: SignatureData) => void
 }) {
@@ -153,6 +244,20 @@ function SignatureUpload({
         }}
       />
       <div className="sig-line">
+        <span>Name:&nbsp;</span>
+        <input
+          type="text"
+          className="sig-name-input"
+          list={`sig-names-${nameKey}`}
+          placeholder="Name"
+          value={value.name}
+          onChange={(e) => onChange({ ...value, name: e.target.value })}
+        />
+        <datalist id={`sig-names-${nameKey}`}>
+          {SIGNATURE_NAMES[nameKey].map((n) => <option key={n} value={n} />)}
+        </datalist>
+      </div>
+      <div className="sig-line sig-line-plain">
         <span>Date:&nbsp;</span>
         <input
           type="date"
@@ -178,6 +283,7 @@ export default function MofaForm() {
   const [parts, setParts] = useState('')
   const [payableAmount, setPayableAmount] = useState('')
   const [offerAmount, setOfferAmount] = useState('')
+  const [policyExcess, setPolicyExcess] = useState('')
 
   const [settlementBasis, setSettlementBasis] = useState<SettlementBasis>('Estimate Basis')
 
@@ -188,12 +294,17 @@ export default function MofaForm() {
   const [needSalvages, setNeedSalvages] = useState(true)
   const [subjectToPolicyCondition, setSubjectToPolicyCondition] = useState(false)
   const [needVatInvoice, setNeedVatInvoice] = useState(false)
+  const [applyTyrePenalty, setApplyTyrePenalty] = useState(false)
+
+  const [tyres, setTyres] = useState<ReportData['tyres']>({
+    FrontRhs: '', FrontLhs: '', RearRhsIn: '', RearRhsOut: '', RearLhsIn: '', RearLhsOut: '',
+  })
 
   const [notes, setNotes] = useState('')
   const [signatures, setSignatures] = useState<Signatures>({
-    areaEngineer: { imageSrc: null, date: '' },
-    zonalEngineer: { imageSrc: null, date: '' },
-    managerMotor: { imageSrc: null, date: '' },
+    areaEngineer: { imageSrc: null, name: '', date: '' },
+    zonalEngineer: { imageSrc: null, name: '', date: '' },
+    managerMotor: { imageSrc: null, name: '', date: '' },
   })
 
   const laborNum = parseFloat(labor) || 0
@@ -228,6 +339,7 @@ export default function MofaForm() {
   printItems.push(needAri ? 'Need ARI' : 'No need ARI')
   printItems.push(needSalvages ? 'Need Salvages (REF ESTIMATE)' : 'No need salvages')
   if (subjectToPolicyCondition) printItems.push('Subject to policy condition')
+  if (applyTyrePenalty) printItems.push('Need to apply tyre penalty')
   if (settlementBasis === 'Wreck to the Insure Basis')
     printItems.push('Need to cancel policy (only Wreck to the Insure Basis)')
   if (settlementBasis === 'Estimate Basis' && needVatInvoice) printItems.push('Need VAT Invoice')
@@ -237,8 +349,10 @@ export default function MofaForm() {
     settlementBasis,
     vehicleNo, moi, model, pav, sum, underInsurancePct, underInsuranceAmt,
     labor, parts, acr,
-    payableAmount, offerAmount,
+    payableAmount, offerAmount, policyExcess,
     items: printItems,
+    applyTyrePenalty,
+    tyres,
     notes,
     signatures,
     visibleSigKeys: visibleSigs.map((s) => s.key),
@@ -317,25 +431,17 @@ export default function MofaForm() {
             </tr>
             <tr>
               <th>Under Insurance Penalty %</th>
-              <td className="ui-split-td">
-                <span className="ui-split-half">
-                  <span className="cell-sublabel">Percentage</span>
-                  <span className="pct-input-wrapper">
-                    <input
-                      type="text"
-                      value={underInsurancePct}
-                      onChange={(e) => {
-                        const v = e.target.value.replace(/[^0-9.]/g, '')
-                        setUnderInsurancePct(v)
-                      }}
-                    />
-                    <span className="pct-suffix">%</span>
-                  </span>
-                </span>
-                <span className="ui-split-divider" />
-                <span className="ui-split-half">
-                  <span className="cell-sublabel">Amount</span>
-                  <CurrencyInput onChange={setUnderInsuranceAmt} />
+              <td>
+                <span className="pct-input-wrapper">
+                  <input
+                    type="text"
+                    value={underInsurancePct}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/[^0-9.]/g, '')
+                      setUnderInsurancePct(v)
+                    }}
+                  />
+                  <span className="pct-suffix">%</span>
                 </span>
               </td>
             </tr>
@@ -372,17 +478,30 @@ export default function MofaForm() {
             </tr>
             {settlementBasis !== 'Estimate Basis' && (
               <tr>
-                <th>Payable Amount</th>
+                <th>Offer Amount</th>
                 <td>
-                  <CurrencyInput onChange={setPayableAmount} />
+                  <CurrencyInput value={offerAmount} onChange={setOfferAmount} />
+                  <OfferHint acr={acr} offerRaw={offerAmount} onPick={(v) => setOfferAmount(String(v))} />
                 </td>
               </tr>
             )}
+            <tr>
+              <th>Under Insurance Amount</th>
+              <td>
+                <CurrencyInput onChange={setUnderInsuranceAmt} />
+              </td>
+            </tr>
+            <tr>
+              <th>Policy Excess</th>
+              <td>
+                <CurrencyInput onChange={setPolicyExcess} />
+              </td>
+            </tr>
             {settlementBasis !== 'Estimate Basis' && (
               <tr>
-                <th>Offer Amount</th>
+                <th>Payable Amount</th>
                 <td>
-                  <CurrencyInput onChange={setOfferAmount} />
+                  <CurrencyInput onChange={setPayableAmount} />
                 </td>
               </tr>
             )}
@@ -418,6 +537,11 @@ export default function MofaForm() {
           onChange={setSubjectToPolicyCondition}
           label="Subject to policy condition"
         />
+        <Toggle
+          checked={applyTyrePenalty}
+          onChange={setApplyTyrePenalty}
+          label="Need to apply tyre penalty"
+        />
 
         {settlementBasis === 'Wreck to the Insure Basis' && (
           <div className="mofa-info-pill no-print">
@@ -441,6 +565,32 @@ export default function MofaForm() {
         </ol>
       </div>
 
+      {/* Tyre Report */}
+      {applyTyrePenalty && (
+        <div className="section-break">
+          <h2>Tyre Report</h2>
+          <table className="tyre-table">
+            <thead>
+              <tr><th>Position</th><th>Condition</th></tr>
+            </thead>
+            <tbody>
+              {TYRES.map(({ key, label }) => (
+                <tr key={key}>
+                  <td>{label}</td>
+                  <td>
+                    <input
+                      type="text"
+                      value={tyres[key]}
+                      onChange={(e) => setTyres((prev) => ({ ...prev, [key]: e.target.value }))}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
       {/* Notes */}
       <div className="section-break">
         <h2 className="no-print">Further Notes</h2>
@@ -462,6 +612,7 @@ export default function MofaForm() {
             <SignatureUpload
               key={key}
               label={label}
+              nameKey={key}
               value={signatures[key]}
               onChange={(data) => setSignatures((prev) => ({ ...prev, [key]: data }))}
             />

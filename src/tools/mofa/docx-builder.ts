@@ -121,6 +121,61 @@ function labelValueTable(rows: [string, string][]): Table {
   })
 }
 
+function headerCell(text: string, widthPct: number) {
+  return new TableCell({
+    width: { size: widthPct, type: WidthType.PERCENTAGE },
+    borders: BORDERS_CELL,
+    shading: { type: ShadingType.CLEAR, fill: C_HEADING_BG },
+    children: [new Paragraph({
+      children: [run(text, { bold: true, size: 20 })],
+      spacing: { before: 60, after: 60 },
+      indent: { left: 80 },
+    })],
+  })
+}
+
+function buildTyreTable(tyres: ReportData['tyres']): Table {
+  const rows: [string, string][] = [
+    ['Front RHS',      tyres.FrontRhs],
+    ['Front LHS',      tyres.FrontLhs],
+    ['Rear RHS – In',  tyres.RearRhsIn],
+    ['Rear RHS – Out', tyres.RearRhsOut],
+    ['Rear LHS – In',  tyres.RearLhsIn],
+    ['Rear LHS – Out', tyres.RearLhsOut],
+  ]
+  return new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    rows: [
+      new TableRow({ children: [headerCell('Position', 30), headerCell('Condition', 70)] }),
+      ...rows.map(([label, value]) =>
+        new TableRow({
+          children: [
+            new TableCell({
+              width: { size: 30, type: WidthType.PERCENTAGE },
+              borders: BORDERS_CELL,
+              shading: { type: ShadingType.CLEAR, fill: C_LABEL_BG },
+              children: [new Paragraph({
+                children: [run(label, { bold: true, size: 20 })],
+                spacing: { before: 60, after: 60 },
+                indent: { left: 80 },
+              })],
+            }),
+            new TableCell({
+              width: { size: 70, type: WidthType.PERCENTAGE },
+              borders: BORDERS_CELL,
+              children: [new Paragraph({
+                children: [run(value, { size: 20 })],
+                spacing: { before: 60, after: 60 },
+                indent: { left: 80 },
+              })],
+            }),
+          ],
+        })
+      ),
+    ],
+  })
+}
+
 function buildSignaturesTable(
   signatures: ReportData['signatures'],
   visibleKeys: ReportData['visibleSigKeys'],
@@ -174,6 +229,19 @@ function buildSignaturesTable(
           })
         ),
       }),
+      // Name row
+      new TableRow({
+        children: entries.map(([, sig]) =>
+          new TableCell({
+            borders: BORDERS_NONE,
+            children: [new Paragraph({
+              children: [run(sig.name || ' ', { bold: true, size: 20 })],
+              alignment: AlignmentType.CENTER,
+              spacing: { before: 40 },
+            })],
+          })
+        ),
+      }),
       // Date row
       new TableRow({
         children: entries.map(([, sig]) =>
@@ -182,7 +250,7 @@ function buildSignaturesTable(
             children: [new Paragraph({
               children: [run(`Date: ${sig.date}`, { size: 18, color: C_MUTED })],
               alignment: AlignmentType.CENTER,
-              spacing: { before: 80 },
+              spacing: { before: 40 },
             })],
           })
         ),
@@ -201,15 +269,22 @@ async function buildDocx(data: ReportData): Promise<Blob> {
     ['PAV', fmtLKR(data.pav)],
     ['SUM', fmtLKR(data.sum)],
     ['Under Insurance Penalty %', data.underInsurancePct ? `${data.underInsurancePct}%` : ''],
-    ['Under Insurance Amount', fmtLKR(data.underInsuranceAmt)],
   ]
 
+  const isEstimateBasis = data.settlementBasis === 'Estimate Basis'
   const offerRows: [string, string][] = [
     ['Labor', fmtLKR(data.labor)],
     ['Parts', fmtLKR(data.parts)],
     ['ACR = Labor + Parts', fmtLKR(data.acr)],
-    ['Payable Amount', fmtLKR(data.payableAmount)],
-    ['Offer Amount', fmtLKR(data.offerAmount)],
+    // Offer Amount and Payable Amount are omitted on Estimate Basis (matches form UI/print)
+    ...(isEstimateBasis
+      ? []
+      : ([['Offer Amount', fmtLKR(data.offerAmount)]] as [string, string][])),
+    ['Under Insurance Amount', fmtLKR(data.underInsuranceAmt)],
+    ['Policy Excess', fmtLKR(data.policyExcess)],
+    ...(isEstimateBasis
+      ? []
+      : ([['Payable Amount', fmtLKR(data.payableAmount)]] as [string, string][])),
   ]
 
   const itemParagraphs = data.items.map((item, i) =>
@@ -235,6 +310,10 @@ async function buildDocx(data: ReportData): Promise<Blob> {
     labelValueTable(offerRows),
 
     ...itemParagraphs,
+
+    ...(data.applyTyrePenalty
+      ? [sectionHeading('Tyre Report'), buildTyreTable(data.tyres)]
+      : []),
 
     ...(data.notes.trim()
       ? [new Paragraph({ spacing: { before: 200 } }), bodyParagraph(data.notes.trim())]

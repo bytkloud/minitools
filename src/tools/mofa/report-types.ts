@@ -1,5 +1,6 @@
 export interface SignatureData {
   imageSrc: string | null
+  name: string
   date: string
 }
 
@@ -23,9 +24,21 @@ export interface ReportData {
   acr: number
   payableAmount: string
   offerAmount: string
+  policyExcess: string
 
   // Conditional items (pre-computed, ordered, numbered from 3 in output)
   items: string[]
+
+  // Tyre report (only rendered when applyTyrePenalty is true)
+  applyTyrePenalty: boolean
+  tyres: {
+    FrontRhs: string
+    FrontLhs: string
+    RearRhsIn: string
+    RearRhsOut: string
+    RearLhsIn: string
+    RearLhsOut: string
+  }
 
   // Notes
   notes: string
