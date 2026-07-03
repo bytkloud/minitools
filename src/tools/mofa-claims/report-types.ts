@@ -25,7 +25,6 @@ export interface ReportData {
   coverTo: string
   sumInsured: string
   valuationAmount: string
-  valuationWords: string
   payableAmount: string
 
   closing: ClosingSignOff
