@@ -31,7 +31,7 @@ function ChecklistRow({
   onRemove?: () => void
 }) {
   return (
-    <div className="checklist-row">
+    <div className={`checklist-row${item.checked ? '' : ' checklist-unchecked'}`}>
       <label className="checklist-label">
         <input type="checkbox" checked={item.checked} onChange={(e) => onToggle(e.target.checked)} />
         <span>{item.label}</span>

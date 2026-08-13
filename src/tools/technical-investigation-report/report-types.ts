@@ -15,6 +15,7 @@ export interface ReportData {
   moiNo: string
   makeModel: string
   acr: string
+  accidentDate: string
   accidentDescription: string
   observations: ObservationData[]
   recommendation: string

@@ -261,6 +261,12 @@
   color: #333;
 }
 
+@media (max-width: 640px) {
+  .photo-gallery {
+    grid-template-columns: 1fr;
+  }
+}
+
 .action-buttons {
   display: flex;
   gap: 0.75rem;
@@ -314,6 +320,10 @@
 
   .checklist {
     break-inside: avoid;
+  }
+
+  .checklist-unchecked {
+    display: none !important;
   }
 
   .photo-thumb .remove-btn {

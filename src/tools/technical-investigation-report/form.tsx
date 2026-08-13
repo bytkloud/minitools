@@ -11,10 +11,11 @@ const SIGNATURES = [
 ]
 
 const VEHICLE_FIELDS = [
-  { field: 'vehicleNo' as const, label: 'Vehicle No' },
-  { field: 'moiNo' as const, label: 'MOI No' },
-  { field: 'makeModel' as const, label: 'Make / Model' },
-  { field: 'acr' as const, label: 'ACR' },
+  { field: 'vehicleNo' as const, label: 'Vehicle No', type: 'text' },
+  { field: 'moiNo' as const, label: 'MOI No', type: 'text' },
+  { field: 'makeModel' as const, label: 'Make / Model', type: 'text' },
+  { field: 'acr' as const, label: 'ACR', type: 'text' },
+  { field: 'accidentDate' as const, label: 'Accident Date', type: 'date' },
 ]
 
 function ObservationImageSlot({ idx, onChange, onRemove, src }: {
@@ -114,7 +115,7 @@ function SignatureUpload({ label, nameKey, value, onChange }: {
 }
 
 export default function TechnicalInvestigationReportForm() {
-  const [vehicleFields, setVehicleFields] = useState({ vehicleNo: '', moiNo: '', makeModel: '', acr: '' })
+  const [vehicleFields, setVehicleFields] = useState({ vehicleNo: '', moiNo: '', makeModel: '', acr: '', accidentDate: '' })
   const [accidentDescription, setAccidentDescription] = useState('')
   const [recommendation, setRecommendation] = useState('')
   const [observationRows, setObservationRows] = useState<number[]>([0])
@@ -179,12 +180,12 @@ export default function TechnicalInvestigationReportForm() {
         <h2>Vehicle Details</h2>
         <table>
           <tbody>
-            {VEHICLE_FIELDS.map(({ field, label }) => (
+            {VEHICLE_FIELDS.map(({ field, label, type }) => (
               <tr key={field}>
                 <th>{label}</th>
                 <td>
                   <input
-                    type="text"
+                    type={type}
                     value={vehicleFields[field]}
                     onChange={(e) => setVehicleFields(prev => ({ ...prev, [field]: e.target.value }))}
                   />

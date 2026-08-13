@@ -90,6 +90,7 @@ function buildVehicleTable(data: ReportData) {
     ['MOI No',        data.moiNo],
     ['Make / Model',  data.makeModel],
     ['ACR',           data.acr],
+    ['Accident Date', data.accidentDate],
   ]
   return new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },

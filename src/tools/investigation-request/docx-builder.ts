@@ -81,9 +81,9 @@ function bodyParagraph(content: string) {
   })
 }
 
-function checklistRow(num: number, label: string, checked: boolean) {
+function checklistRow(num: number, label: string) {
   return new Paragraph({
-    children: [run(`${checked ? '☑' : '☐'}  ${num}. ${label}`, { size: 20 })],
+    children: [run(`☑  ${num}. ${label}`, { size: 20 })],
     spacing: { before: 40, after: 40 },
   })
 }
@@ -99,15 +99,17 @@ function buildChecklist(data: ReportData) {
   const rows: Paragraph[] = []
   let num = 0
 
-  data.checklist.forEach((item) => {
+  data.checklist.filter((item) => item.checked).forEach((item) => {
     num += 1
-    rows.push(checklistRow(num, item.label, item.checked))
+    rows.push(checklistRow(num, item.label))
   })
 
   data.customItems.forEach((item) => {
     num += 1
     rows.push(checklistRowPlain(num, item.label))
   })
+
+  if (rows.length === 0) rows.push(bodyParagraph('No areas selected.'))
 
   return rows
 }
