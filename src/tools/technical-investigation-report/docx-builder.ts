@@ -13,6 +13,7 @@ import {
   WidthType,
 } from 'docx'
 import type { ObservationData, ReportData, SignatureData } from './report-types'
+import { resolveSignatureLabel } from '../../data/signatureNames'
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
@@ -166,7 +167,7 @@ function buildObservationBlock(obs: ObservationData, index: number): (Paragraph 
 
 function buildSignaturesTable(sigs: ReportData['signatures']) {
   const entries: [string, SignatureData][] = [
-    ['Area Engineer',           sigs.areaEngineer],
+    [resolveSignatureLabel('areaEngineer', sigs.areaEngineer.name, 'Area Engineer'), sigs.areaEngineer],
     ['Zonal Engineer',          sigs.zonalEngineer],
     ['Manager Motor Engineer',  sigs.managerMotor],
   ]

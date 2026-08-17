@@ -13,6 +13,7 @@ import {
   WidthType,
 } from 'docx'
 import type { DamageData, ReportData, SignatureData } from './report-types'
+import { resolveSignatureLabel } from '../../data/signatureNames'
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
@@ -247,7 +248,7 @@ function buildTyreTable(tyres: ReportData['tyres']) {
 
 function buildSignaturesTable(sigs: ReportData['signatures']) {
   const entries: [string, SignatureData][] = [
-    ['Area Engineer',          sigs.areaEngineer],
+    [resolveSignatureLabel('areaEngineer', sigs.areaEngineer.name, 'Area Engineer'), sigs.areaEngineer],
     ['Zonal Engineer 1',       sigs.zonalEngineer1],
     ['Zonal Engineer 2',       sigs.zonalEngineer2],
     ['Manager Motor Engineer', sigs.managerMotor],

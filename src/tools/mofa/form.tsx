@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { normalizeImage } from '../../utils/normalizeImage'
 import { downloadDocx } from './docx-builder'
 import type { ReportData, SignatureData } from './report-types'
-import { SIGNATURE_NAMES, type SignatureKey } from '../../data/signatureNames'
+import { SIGNATURE_NAMES, resolveSignatureLabel, type SignatureKey } from '../../data/signatureNames'
 
 type Signatures = {
   areaEngineer: SignatureData
@@ -214,7 +214,7 @@ function SignatureUpload({
 
   return (
     <div className="signature-box">
-      <div className="sig-label">{label}</div>
+      <div className="sig-label">{resolveSignatureLabel(nameKey, value.name, label)}</div>
       <div className="sig-upload-area" onClick={() => !value.imageSrc && inputRef.current?.click()}>
         {value.imageSrc ? (
           <div className="sig-preview-wrapper">

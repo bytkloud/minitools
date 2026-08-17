@@ -13,6 +13,7 @@ import {
   WidthType,
 } from 'docx'
 import type { ReportData, SignatureData } from './report-types'
+import { resolveSignatureLabel } from '../../data/signatureNames'
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
@@ -187,7 +188,7 @@ function buildSignaturesTable(
   }
 
   const entries: [string, SignatureData][] = visibleKeys.map((key) => [
-    SIG_LABELS[key],
+    resolveSignatureLabel(key, signatures[key].name, SIG_LABELS[key]),
     signatures[key],
   ])
 

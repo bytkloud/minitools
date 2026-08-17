@@ -8,6 +8,18 @@
 
 export type SignatureKey = 'areaEngineer' | 'zonalEngineer' | 'managerMotor'
 
+// Assistant Area Engineers are substitutes for the Area Engineer — they can
+// sign wherever an Area Engineer signature is required, but the printed
+// label should read "Assistant Area Engineer" instead of "Area Engineer".
+export const ASSISTANT_AREA_ENGINEER_NAMES: string[] = [
+  'Ashan Pradeep',
+  'Paul Crishanth',
+  'Sameera Hasantha',
+  'Aravinda Upul',
+  'Sudesh Kumara',
+  'Thilanka Sameera',
+]
+
 export const SIGNATURE_NAMES: Record<SignatureKey, string[]> = {
   areaEngineer: [
     "Asanka Gimhan",
@@ -15,7 +27,8 @@ export const SIGNATURE_NAMES: Record<SignatureKey, string[]> = {
     "Sewwanda Nadeeshan",
     "Prasanna Ekanayake",
     "Noyel Sampath",
-    "Mahendra Saumyan"
+    "Mahendra Saumyan",
+    ...ASSISTANT_AREA_ENGINEER_NAMES,
   ],
   zonalEngineer: [
     "Kasun Rathnayake",
@@ -25,4 +38,17 @@ export const SIGNATURE_NAMES: Record<SignatureKey, string[]> = {
   managerMotor: [
     "Kosala Abeysinghe"
   ],
+}
+
+export function isAssistantAreaEngineer(name: string): boolean {
+  const trimmed = name.trim().toLowerCase()
+  if (!trimmed) return false
+  return ASSISTANT_AREA_ENGINEER_NAMES.some((n) => n.toLowerCase() === trimmed)
+}
+
+// Returns "Assistant Area Engineer" when the entered name is one of the
+// assistant area engineers, otherwise falls back to the form's default label.
+export function resolveSignatureLabel(key: SignatureKey, name: string, defaultLabel: string): string {
+  if (key === 'areaEngineer' && isAssistantAreaEngineer(name)) return 'Assistant Area Engineer'
+  return defaultLabel
 }
