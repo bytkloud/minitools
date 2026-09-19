@@ -452,18 +452,23 @@
   padding: 0.5rem 0;
 }
 
+.mofa-comment-lines div {
+  height: 1.9rem;
+  border-bottom: 1px solid #333;
+}
+
 /* Signatures */
 .signature-section {
   display: flex;
   justify-content: space-between;
   margin-top: 2rem;
   gap: 1rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .signature-box {
   flex: 1;
-  min-width: 200px;
+  min-width: 0;
   text-align: center;
 }
 

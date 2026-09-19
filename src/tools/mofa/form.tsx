@@ -4,16 +4,11 @@ import { downloadDocx } from './docx-builder'
 import type { ReportData, SignatureData } from './report-types'
 import { SIGNATURE_NAMES, resolveSignatureLabel, type SignatureKey } from '../../data/signatureNames'
 
-type Signatures = {
-  areaEngineer: SignatureData
-  zonalEngineer: SignatureData
-  managerMotor: SignatureData
-}
-
-const ALL_SIGS: { key: keyof Signatures; label: string }[] = [
-  { key: 'areaEngineer', label: 'Area Engineer' },
-  { key: 'zonalEngineer', label: 'Zonal Engineer' },
-  { key: 'managerMotor', label: 'Manager Motor Engineer' },
+const SIGNATURES = [
+  { key: 'areaEngineer'   as const, nameKey: 'areaEngineer'  as const, label: 'Area Engineer' },
+  { key: 'zonalEngineer1' as const, nameKey: 'zonalEngineer' as const, label: 'Zonal Engineer 1' },
+  { key: 'zonalEngineer2' as const, nameKey: 'zonalEngineer' as const, label: 'Zonal Engineer 2' },
+  { key: 'managerMotor'   as const, nameKey: 'managerMotor'  as const, label: 'Manager Motor Engineer' },
 ]
 
 type SettlementBasis =
@@ -198,11 +193,13 @@ function YesNo({
 function SignatureUpload({
   label,
   nameKey,
+  listId,
   value,
   onChange,
 }: {
   label: string
   nameKey: SignatureKey
+  listId: string
   value: SignatureData
   onChange: (data: SignatureData) => void
 }) {
@@ -248,12 +245,12 @@ function SignatureUpload({
         <input
           type="text"
           className="sig-name-input"
-          list={`sig-names-${nameKey}`}
+          list={listId}
           placeholder="Name"
           value={value.name}
           onChange={(e) => onChange({ ...value, name: e.target.value })}
         />
-        <datalist id={`sig-names-${nameKey}`}>
+        <datalist id={listId}>
           {SIGNATURE_NAMES[nameKey].map((n) => <option key={n} value={n} />)}
         </datalist>
       </div>
@@ -301,10 +298,12 @@ export default function MofaForm() {
   })
 
   const [notes, setNotes] = useState('')
-  const [signatures, setSignatures] = useState<Signatures>({
-    areaEngineer: { imageSrc: null, name: '', date: '' },
-    zonalEngineer: { imageSrc: null, name: '', date: '' },
-    managerMotor: { imageSrc: null, name: '', date: '' },
+  const [consultantComment, setConsultantComment] = useState('')
+  const [signatures, setSignatures] = useState<ReportData['signatures']>({
+    areaEngineer:   { imageSrc: null, name: '', date: '' },
+    zonalEngineer1: { imageSrc: null, name: '', date: '' },
+    zonalEngineer2: { imageSrc: null, name: '', date: '' },
+    managerMotor:   { imageSrc: null, name: '', date: '' },
   })
 
   const laborNum = parseFloat(labor) || 0
@@ -316,13 +315,6 @@ export default function MofaForm() {
 
   const salutation =
     approvalLevel === 'ze' ? 'ZE' : approvalLevel === 'mme' ? 'MME' : null
-
-  const visibleSigs =
-    approvalLevel === 'none'
-      ? ALL_SIGS.slice(0, 1)
-      : approvalLevel === 'ze'
-      ? ALL_SIGS.slice(0, 2)
-      : ALL_SIGS
 
   const bannerText = {
     none: 'ACR below LKR 500,000 — No approval required',
@@ -354,8 +346,8 @@ export default function MofaForm() {
     applyTyrePenalty,
     tyres,
     notes,
+    consultantComment,
     signatures,
-    visibleSigKeys: visibleSigs.map((s) => s.key),
   })
 
   const filename = vehicleNo ? `${vehicleNo}.docx` : 'mofa.docx'
@@ -604,15 +596,35 @@ export default function MofaForm() {
         {notes && <div className="mofa-notes-print print-only">{notes}</div>}
       </div>
 
+      {/* Consultant engineer's comment */}
+      <div className="section-break">
+        <h2>Consultant Engineer's Comment</h2>
+        <textarea
+          className="report-textarea no-print"
+          rows={3}
+          value={consultantComment}
+          onChange={(e) => setConsultantComment(e.target.value)}
+          placeholder="Type a comment, or leave empty to hand-write after printing..."
+        />
+        {consultantComment.trim() ? (
+          <div className="mofa-notes-print print-only">{consultantComment}</div>
+        ) : (
+          <div className="mofa-comment-lines print-only">
+            <div /><div /><div />
+          </div>
+        )}
+      </div>
+
       {/* Signatures */}
       <div className="section-break">
         <h2>Signatures</h2>
         <div className="signature-section">
-          {visibleSigs.map(({ key, label }) => (
+          {SIGNATURES.map(({ key, nameKey, label }) => (
             <SignatureUpload
               key={key}
               label={label}
-              nameKey={key}
+              nameKey={nameKey}
+              listId={`sig-names-${key}`}
               value={signatures[key]}
               onChange={(data) => setSignatures((prev) => ({ ...prev, [key]: data }))}
             />

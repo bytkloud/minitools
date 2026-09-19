@@ -43,11 +43,14 @@ export interface ReportData {
   // Notes
   notes: string
 
+  // Consultant engineer's comment (blank → ruled lines for hand-writing)
+  consultantComment: string
+
   // Signatures
   signatures: {
     areaEngineer: SignatureData
-    zonalEngineer: SignatureData
+    zonalEngineer1: SignatureData
+    zonalEngineer2: SignatureData
     managerMotor: SignatureData
   }
-  visibleSigKeys: ('areaEngineer' | 'zonalEngineer' | 'managerMotor')[]
 }

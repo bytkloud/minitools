@@ -177,20 +177,13 @@ function buildTyreTable(tyres: ReportData['tyres']): Table {
   })
 }
 
-function buildSignaturesTable(
-  signatures: ReportData['signatures'],
-  visibleKeys: ReportData['visibleSigKeys'],
-): Table {
-  const SIG_LABELS: Record<string, string> = {
-    areaEngineer: 'Area Engineer',
-    zonalEngineer: 'Zonal Engineer',
-    managerMotor: 'Manager Motor Engineer',
-  }
-
-  const entries: [string, SignatureData][] = visibleKeys.map((key) => [
-    resolveSignatureLabel(key, signatures[key].name, SIG_LABELS[key]),
-    signatures[key],
-  ])
+function buildSignaturesTable(sigs: ReportData['signatures']): Table {
+  const entries: [string, SignatureData][] = [
+    [resolveSignatureLabel('areaEngineer', sigs.areaEngineer.name, 'Area Engineer'), sigs.areaEngineer],
+    ['Zonal Engineer 1',       sigs.zonalEngineer1],
+    ['Zonal Engineer 2',       sigs.zonalEngineer2],
+    ['Manager Motor Engineer', sigs.managerMotor],
+  ]
 
   return new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
@@ -320,8 +313,16 @@ async function buildDocx(data: ReportData): Promise<Blob> {
       ? [new Paragraph({ spacing: { before: 200 } }), bodyParagraph(data.notes.trim())]
       : []),
 
+    sectionHeading("Consultant Engineer's Comment"),
+    ...(data.consultantComment.trim()
+      ? [bodyParagraph(data.consultantComment.trim())]
+      : [1, 2, 3].map(() => new Paragraph({
+          spacing: { before: 360 },
+          border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: '000000', space: 1 } },
+        }))),
+
     sectionHeading('Signatures'),
-    buildSignaturesTable(data.signatures, data.visibleSigKeys),
+    buildSignaturesTable(data.signatures),
   ]
 
   const doc = new Document({
