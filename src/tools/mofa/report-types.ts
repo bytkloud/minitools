@@ -57,4 +57,8 @@ export interface ReportData {
   // Saving Details stencil (only rendered when showSavingDetails is true)
   showSavingDetails: boolean
   accidentDate: string
+  garageIntimationDate: string
+  repairCompletionMonth: string
+  partsSaving: string
+  totalSavings: string
 }

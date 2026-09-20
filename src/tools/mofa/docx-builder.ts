@@ -268,11 +268,11 @@ function buildSavingDetailsBox(data: ReportData): Table {
 
   const rows: [string, string | null][] = [
     ['Date of Accident:', data.accidentDate || null],
-    ['Date of Garage Intimation:', null],
-    ['Month of Repair Completion:', null],
-    ['Parts Saving (Replace to Repair):', null],
+    ['Date of Garage Intimation:', data.garageIntimationDate || null],
+    ['Month of Repair Completion:', data.repairCompletionMonth || null],
+    ['Parts Saving (Replace to Repair):', fmtLKR(data.partsSaving) || null],
     ['Extra Saving (ACR - Full & Final):', extraSaving !== null ? fmtLKR(extraSaving) : null],
-    ['TOTAL SAVINGS:', null],
+    ['TOTAL SAVINGS:', fmtLKR(data.totalSavings) || null],
   ]
 
   const innerTable = new Table({

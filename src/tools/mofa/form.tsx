@@ -294,6 +294,10 @@ export default function MofaForm() {
   const [applyTyrePenalty, setApplyTyrePenalty] = useState(false)
   const [showSavingDetails, setShowSavingDetails] = useState(false)
   const [accidentDate, setAccidentDate] = useState('')
+  const [garageIntimationDate, setGarageIntimationDate] = useState('')
+  const [repairCompletionMonth, setRepairCompletionMonth] = useState('')
+  const [partsSaving, setPartsSaving] = useState('')
+  const [totalSavings, setTotalSavings] = useState('')
 
   const [tyres, setTyres] = useState<ReportData['tyres']>({
     FrontRhs: '', FrontLhs: '', RearRhsIn: '', RearRhsOut: '', RearLhsIn: '', RearLhsOut: '',
@@ -358,6 +362,10 @@ export default function MofaForm() {
     signatures,
     showSavingDetails,
     accidentDate,
+    garageIntimationDate,
+    repairCompletionMonth,
+    partsSaving,
+    totalSavings,
   })
 
   const filename = vehicleNo ? `${vehicleNo}.docx` : 'mofa.docx'
@@ -656,24 +664,32 @@ export default function MofaForm() {
               <span className="mofa-saving-label">Date of Accident:</span>
               <input
                 type="date"
-                className="mofa-saving-date-input no-print"
+                className="mofa-saving-date-input"
                 value={accidentDate}
                 onChange={(e) => setAccidentDate(e.target.value)}
               />
-              <span className="mofa-saving-value print-only">{accidentDate}</span>
-              {!accidentDate && <span className="mofa-saving-blank print-only" />}
             </div>
             <div className="mofa-saving-row">
               <span className="mofa-saving-label">Date of Garage Intimation:</span>
-              <span className="mofa-saving-blank" />
+              <input
+                type="date"
+                className="mofa-saving-date-input"
+                value={garageIntimationDate}
+                onChange={(e) => setGarageIntimationDate(e.target.value)}
+              />
             </div>
             <div className="mofa-saving-row">
               <span className="mofa-saving-label">Month of Repair Completion:</span>
-              <span className="mofa-saving-blank" />
+              <input
+                type="month"
+                className="mofa-saving-date-input"
+                value={repairCompletionMonth}
+                onChange={(e) => setRepairCompletionMonth(e.target.value)}
+              />
             </div>
             <div className="mofa-saving-row">
               <span className="mofa-saving-label">Parts Saving (Replace to Repair):</span>
-              <span className="mofa-saving-blank" />
+              <CurrencyInput value={partsSaving} onChange={setPartsSaving} />
             </div>
             <div className="mofa-saving-row">
               <span className="mofa-saving-label">Extra Saving (ACR - Full &amp; Final):</span>
@@ -685,7 +701,7 @@ export default function MofaForm() {
             </div>
             <div className="mofa-saving-row mofa-saving-total">
               <span className="mofa-saving-label">TOTAL SAVINGS:</span>
-              <span className="mofa-saving-blank" />
+              <CurrencyInput value={totalSavings} onChange={setTotalSavings} />
             </div>
           </div>
         </div>

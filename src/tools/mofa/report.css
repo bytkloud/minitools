@@ -626,6 +626,21 @@
   font-size: 0.85rem;
 }
 
+.mofa-saving-row .currency-input-wrapper {
+  flex: 1;
+  border-bottom: 1.5px solid #d32f2f;
+}
+
+.mofa-saving-row .currency-prefix {
+  color: #d32f2f;
+}
+
+.mofa-saving-row .currency-input-wrapper input {
+  color: #d32f2f;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
 /* Action buttons */
 .action-buttons {
   display: flex;
@@ -708,7 +723,8 @@
     break-inside: avoid;
   }
 
-  .sig-date-input::-webkit-calendar-picker-indicator {
+  .sig-date-input::-webkit-calendar-picker-indicator,
+  .mofa-saving-date-input::-webkit-calendar-picker-indicator {
     display: none;
   }
 }
