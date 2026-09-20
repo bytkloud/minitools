@@ -267,7 +267,7 @@ function buildSavingDetailsBox(data: ReportData): Table {
       : null
 
   const rows: [string, string | null][] = [
-    ['Date of Accident:', null],
+    ['Date of Accident:', data.accidentDate || null],
     ['Date of Garage Intimation:', null],
     ['Month of Repair Completion:', null],
     ['Parts Saving (Replace to Repair):', null],
@@ -397,8 +397,9 @@ async function buildDocx(data: ReportData): Promise<Blob> {
     sectionHeading('Signatures'),
     buildSignaturesTable(data.signatures),
 
-    new Paragraph({ spacing: { before: 300 } }),
-    buildSavingDetailsBox(data),
+    ...(data.showSavingDetails
+      ? [new Paragraph({ spacing: { before: 300 } }), buildSavingDetailsBox(data)]
+      : []),
   ]
 
   const doc = new Document({

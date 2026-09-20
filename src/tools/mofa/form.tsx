@@ -292,6 +292,8 @@ export default function MofaForm() {
   const [subjectToPolicyCondition, setSubjectToPolicyCondition] = useState(false)
   const [needVatInvoice, setNeedVatInvoice] = useState(false)
   const [applyTyrePenalty, setApplyTyrePenalty] = useState(false)
+  const [showSavingDetails, setShowSavingDetails] = useState(false)
+  const [accidentDate, setAccidentDate] = useState('')
 
   const [tyres, setTyres] = useState<ReportData['tyres']>({
     FrontRhs: '', FrontLhs: '', RearRhsIn: '', RearRhsOut: '', RearLhsIn: '', RearLhsOut: '',
@@ -354,6 +356,8 @@ export default function MofaForm() {
     notes,
     consultantComment,
     signatures,
+    showSavingDetails,
+    accidentDate,
   })
 
   const filename = vehicleNo ? `${vehicleNo}.docx` : 'mofa.docx'
@@ -540,6 +544,11 @@ export default function MofaForm() {
           onChange={setApplyTyrePenalty}
           label="Need to apply tyre penalty"
         />
+        <Toggle
+          checked={showSavingDetails}
+          onChange={setShowSavingDetails}
+          label="Show Saving Details"
+        />
 
         {settlementBasis === 'Wreck to the Insure Basis' && (
           <div className="mofa-info-pill no-print">
@@ -639,39 +648,48 @@ export default function MofaForm() {
       </div>
 
       {/* Saving Details stencil */}
-      <div className="section-break">
-        <div className="mofa-saving-box">
-          <div className="mofa-saving-title">Saving Details</div>
-          <div className="mofa-saving-row">
-            <span className="mofa-saving-label">Date of Accident:</span>
-            <span className="mofa-saving-blank" />
-          </div>
-          <div className="mofa-saving-row">
-            <span className="mofa-saving-label">Date of Garage Intimation:</span>
-            <span className="mofa-saving-blank" />
-          </div>
-          <div className="mofa-saving-row">
-            <span className="mofa-saving-label">Month of Repair Completion:</span>
-            <span className="mofa-saving-blank" />
-          </div>
-          <div className="mofa-saving-row">
-            <span className="mofa-saving-label">Parts Saving (Replace to Repair):</span>
-            <span className="mofa-saving-blank" />
-          </div>
-          <div className="mofa-saving-row">
-            <span className="mofa-saving-label">Extra Saving (ACR - Full &amp; Final):</span>
-            {extraSaving !== null ? (
-              <span className="mofa-saving-value">{fmtLKR(extraSaving)}</span>
-            ) : (
+      {showSavingDetails && (
+        <div className="section-break">
+          <div className="mofa-saving-box">
+            <div className="mofa-saving-title">Saving Details</div>
+            <div className="mofa-saving-row">
+              <span className="mofa-saving-label">Date of Accident:</span>
+              <input
+                type="date"
+                className="mofa-saving-date-input no-print"
+                value={accidentDate}
+                onChange={(e) => setAccidentDate(e.target.value)}
+              />
+              <span className="mofa-saving-value print-only">{accidentDate}</span>
+              {!accidentDate && <span className="mofa-saving-blank print-only" />}
+            </div>
+            <div className="mofa-saving-row">
+              <span className="mofa-saving-label">Date of Garage Intimation:</span>
               <span className="mofa-saving-blank" />
-            )}
-          </div>
-          <div className="mofa-saving-row mofa-saving-total">
-            <span className="mofa-saving-label">TOTAL SAVINGS:</span>
-            <span className="mofa-saving-blank" />
+            </div>
+            <div className="mofa-saving-row">
+              <span className="mofa-saving-label">Month of Repair Completion:</span>
+              <span className="mofa-saving-blank" />
+            </div>
+            <div className="mofa-saving-row">
+              <span className="mofa-saving-label">Parts Saving (Replace to Repair):</span>
+              <span className="mofa-saving-blank" />
+            </div>
+            <div className="mofa-saving-row">
+              <span className="mofa-saving-label">Extra Saving (ACR - Full &amp; Final):</span>
+              {extraSaving !== null ? (
+                <span className="mofa-saving-value">{fmtLKR(extraSaving)}</span>
+              ) : (
+                <span className="mofa-saving-blank" />
+              )}
+            </div>
+            <div className="mofa-saving-row mofa-saving-total">
+              <span className="mofa-saving-label">TOTAL SAVINGS:</span>
+              <span className="mofa-saving-blank" />
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="no-print action-buttons">
         <button className="print-pdf-btn" onClick={handlePrintPDF}>

@@ -606,6 +606,19 @@
   padding-bottom: 0.1rem;
 }
 
+.mofa-saving-date-input {
+  flex: 1;
+  border: none;
+  border-bottom: 1.5px solid #d32f2f;
+  background: transparent;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #d32f2f;
+  outline: none;
+  padding: 0 0 0.1rem;
+}
+
 .mofa-saving-total {
   margin-top: 0.5rem;
   padding-top: 0.6rem;

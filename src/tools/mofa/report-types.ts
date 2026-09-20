@@ -53,4 +53,8 @@ export interface ReportData {
     zonalEngineer2: SignatureData
     managerMotor: SignatureData
   }
+
+  // Saving Details stencil (only rendered when showSavingDetails is true)
+  showSavingDetails: boolean
+  accidentDate: string
 }
