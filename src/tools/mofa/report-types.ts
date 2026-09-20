@@ -60,5 +60,4 @@ export interface ReportData {
   garageIntimationDate: string
   repairCompletionMonth: string
   partsSaving: string
-  totalSavings: string
 }

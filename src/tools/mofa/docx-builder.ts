@@ -266,13 +266,19 @@ function buildSavingDetailsBox(data: ReportData): Table {
       ? data.acr - offerNum
       : null
 
+  const partsSavingNum = parseFloat(data.partsSaving) || 0
+  const totalSavings =
+    partsSavingNum > 0 || extraSaving !== null
+      ? partsSavingNum + (extraSaving ?? 0)
+      : null
+
   const rows: [string, string | null][] = [
     ['Date of Accident:', data.accidentDate || null],
     ['Date of Garage Intimation:', data.garageIntimationDate || null],
     ['Month of Repair Completion:', data.repairCompletionMonth || null],
     ['Parts Saving (Replace to Repair):', fmtLKR(data.partsSaving) || null],
     ['Extra Saving (ACR - Full & Final):', extraSaving !== null ? fmtLKR(extraSaving) : null],
-    ['TOTAL SAVINGS:', fmtLKR(data.totalSavings) || null],
+    ['TOTAL SAVINGS:', totalSavings !== null ? fmtLKR(totalSavings) : null],
   ]
 
   const innerTable = new Table({

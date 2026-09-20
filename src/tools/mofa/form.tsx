@@ -297,7 +297,6 @@ export default function MofaForm() {
   const [garageIntimationDate, setGarageIntimationDate] = useState('')
   const [repairCompletionMonth, setRepairCompletionMonth] = useState('')
   const [partsSaving, setPartsSaving] = useState('')
-  const [totalSavings, setTotalSavings] = useState('')
 
   const [tyres, setTyres] = useState<ReportData['tyres']>({
     FrontRhs: '', FrontLhs: '', RearRhsIn: '', RearRhsOut: '', RearLhsIn: '', RearLhsOut: '',
@@ -320,6 +319,12 @@ export default function MofaForm() {
   const extraSaving =
     settlementBasis === 'Full and final Offer' && acr > 0 && offerNum > 0
       ? acr - offerNum
+      : null
+
+  const partsSavingNum = parseFloat(partsSaving) || 0
+  const totalSavings =
+    partsSavingNum > 0 || extraSaving !== null
+      ? partsSavingNum + (extraSaving ?? 0)
       : null
 
   const approvalLevel: 'none' | 'ze' | 'mme' =
@@ -365,7 +370,6 @@ export default function MofaForm() {
     garageIntimationDate,
     repairCompletionMonth,
     partsSaving,
-    totalSavings,
   })
 
   const filename = vehicleNo ? `${vehicleNo}.docx` : 'mofa.docx'
@@ -701,7 +705,11 @@ export default function MofaForm() {
             </div>
             <div className="mofa-saving-row mofa-saving-total">
               <span className="mofa-saving-label">TOTAL SAVINGS:</span>
-              <CurrencyInput value={totalSavings} onChange={setTotalSavings} />
+              {totalSavings !== null ? (
+                <span className="mofa-saving-value">{fmtLKR(totalSavings)}</span>
+              ) : (
+                <span className="mofa-saving-blank" />
+              )}
             </div>
           </div>
         </div>
