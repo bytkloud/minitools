@@ -310,6 +310,12 @@ export default function MofaForm() {
   const partsNum = parseFloat(parts) || 0
   const acr = laborNum + partsNum
 
+  const offerNum = parseFloat(offerAmount) || 0
+  const extraSaving =
+    settlementBasis === 'Full and final Offer' && acr > 0 && offerNum > 0
+      ? acr - offerNum
+      : null
+
   const approvalLevel: 'none' | 'ze' | 'mme' =
     acr > 750000 ? 'mme' : acr >= 500000 ? 'ze' : 'none'
 
@@ -629,6 +635,41 @@ export default function MofaForm() {
               onChange={(data) => setSignatures((prev) => ({ ...prev, [key]: data }))}
             />
           ))}
+        </div>
+      </div>
+
+      {/* Saving Details stencil */}
+      <div className="section-break">
+        <div className="mofa-saving-box">
+          <div className="mofa-saving-title">Saving Details</div>
+          <div className="mofa-saving-row">
+            <span className="mofa-saving-label">Date of Accident:</span>
+            <span className="mofa-saving-blank" />
+          </div>
+          <div className="mofa-saving-row">
+            <span className="mofa-saving-label">Date of Garage Intimation:</span>
+            <span className="mofa-saving-blank" />
+          </div>
+          <div className="mofa-saving-row">
+            <span className="mofa-saving-label">Month of Repair Completion:</span>
+            <span className="mofa-saving-blank" />
+          </div>
+          <div className="mofa-saving-row">
+            <span className="mofa-saving-label">Parts Saving (Replace to Repair):</span>
+            <span className="mofa-saving-blank" />
+          </div>
+          <div className="mofa-saving-row">
+            <span className="mofa-saving-label">Extra Saving (ACR - Full &amp; Final):</span>
+            {extraSaving !== null ? (
+              <span className="mofa-saving-value">{fmtLKR(extraSaving)}</span>
+            ) : (
+              <span className="mofa-saving-blank" />
+            )}
+          </div>
+          <div className="mofa-saving-row mofa-saving-total">
+            <span className="mofa-saving-label">TOTAL SAVINGS:</span>
+            <span className="mofa-saving-blank" />
+          </div>
         </div>
       </div>
 

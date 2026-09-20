@@ -27,13 +27,19 @@ const C_BORDER = '999999'
 
 // ─── Border presets ───────────────────────────────────────────────────────────
 
+const C_RED = 'D32F2F'
+
 const B_NONE = { style: BorderStyle.NONE, size: 0, color: 'auto' } as const
 const B_CELL = { style: BorderStyle.SINGLE, size: 4, color: C_BORDER } as const
 const B_SIG  = { style: BorderStyle.SINGLE, size: 6, color: '000000' } as const
+const B_RED  = { style: BorderStyle.SINGLE, size: 18, color: C_RED } as const
+const B_RED_LINE = { style: BorderStyle.SINGLE, size: 4, color: C_RED } as const
 
 const BORDERS_NONE = { top: B_NONE, bottom: B_NONE, left: B_NONE, right: B_NONE, insideHorizontal: B_NONE, insideVertical: B_NONE }
 const BORDERS_CELL = { top: B_CELL, bottom: B_CELL, left: B_CELL, right: B_CELL }
 const BORDERS_SIG  = { top: B_NONE, bottom: B_SIG,  left: B_NONE, right: B_NONE }
+const BORDERS_RED_BOX = { top: B_RED, bottom: B_RED, left: B_RED, right: B_RED }
+const BORDERS_RED_LINE = { top: B_NONE, bottom: B_RED_LINE, left: B_NONE, right: B_NONE }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -253,6 +259,73 @@ function buildSignaturesTable(sigs: ReportData['signatures']): Table {
   })
 }
 
+function buildSavingDetailsBox(data: ReportData): Table {
+  const offerNum = parseFloat(data.offerAmount) || 0
+  const extraSaving =
+    data.settlementBasis === 'Full and final Offer' && data.acr > 0 && offerNum > 0
+      ? data.acr - offerNum
+      : null
+
+  const rows: [string, string | null][] = [
+    ['Date of Accident:', null],
+    ['Date of Garage Intimation:', null],
+    ['Month of Repair Completion:', null],
+    ['Parts Saving (Replace to Repair):', null],
+    ['Extra Saving (ACR - Full & Final):', extraSaving !== null ? fmtLKR(extraSaving) : null],
+    ['TOTAL SAVINGS:', null],
+  ]
+
+  const innerTable = new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    borders: BORDERS_NONE,
+    rows: rows.map(([label, value]) =>
+      new TableRow({
+        children: [
+          new TableCell({
+            width: { size: 55, type: WidthType.PERCENTAGE },
+            borders: BORDERS_NONE,
+            children: [new Paragraph({
+              children: [run(label, { bold: true, size: 20, color: C_RED })],
+              spacing: { before: 140, after: 40 },
+            })],
+          }),
+          new TableCell({
+            width: { size: 45, type: WidthType.PERCENTAGE },
+            borders: BORDERS_RED_LINE,
+            children: [new Paragraph({
+              children: [run(value ?? ' ', { bold: true, size: 20, color: C_RED })],
+              spacing: { before: 140, after: 40 },
+            })],
+          }),
+        ],
+      })
+    ),
+  })
+
+  return new Table({
+    width: { size: 60, type: WidthType.PERCENTAGE },
+    alignment: AlignmentType.LEFT,
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            borders: BORDERS_RED_BOX,
+            margins: { top: 200, bottom: 200, left: 200, right: 200 },
+            children: [
+              new Paragraph({
+                children: [run('SAVING DETAILS', { bold: true, size: 26, color: C_RED })],
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 160 },
+              }),
+              innerTable,
+            ],
+          }),
+        ],
+      }),
+    ],
+  })
+}
+
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 async function buildDocx(data: ReportData): Promise<Blob> {
@@ -323,6 +396,9 @@ async function buildDocx(data: ReportData): Promise<Blob> {
 
     sectionHeading('Signatures'),
     buildSignaturesTable(data.signatures),
+
+    new Paragraph({ spacing: { before: 300 } }),
+    buildSavingDetailsBox(data),
   ]
 
   const doc = new Document({
