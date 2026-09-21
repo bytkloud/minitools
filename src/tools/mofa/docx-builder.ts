@@ -14,7 +14,6 @@ import {
 } from 'docx'
 import type { ReportData, SignatureData } from './report-types'
 import { resolveSignatureLabel } from '../../data/signatureNames'
-import { buildWatermarkHeader } from './watermark'
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
@@ -423,7 +422,6 @@ async function buildDocx(data: ReportData): Promise<Blob> {
       properties: {
         page: { margin: { top: 1440, bottom: 1440, left: 1800, right: 1440 } },
       },
-      headers: { default: buildWatermarkHeader() },
       children,
     }],
   })
