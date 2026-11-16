@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { lazy, Suspense } from 'react'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { lazy, Suspense, useEffect } from 'react'
+import { trackPageview } from './utils/track'
 import Home from './pages/Home'
 
 const InsuranceCalc = lazy(() => import('./tools/insurance-calc'))
@@ -9,9 +10,16 @@ const Mofa = lazy(() => import('./tools/mofa'))
 const MofaClaims = lazy(() => import('./tools/mofa-claims'))
 const InvestigationRequest = lazy(() => import('./tools/investigation-request'))
 
+function PageviewTracker() {
+  const { pathname } = useLocation()
+  useEffect(() => { trackPageview(pathname) }, [pathname])
+  return null
+}
+
 export default function App() {
   return (
     <BrowserRouter>
+      <PageviewTracker />
       <Suspense fallback={<div className="flex items-center justify-center h-screen text-slate-400">Loading...</div>}>
         <Routes>
           <Route path="/" element={<Home />} />

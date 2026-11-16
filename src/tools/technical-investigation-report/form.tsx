@@ -3,6 +3,7 @@ import { downloadDocx } from './docx-builder'
 import { normalizeImage } from '../../utils/normalizeImage'
 import type { ReportData, SignatureData } from './report-types'
 import { SIGNATURE_NAMES, resolveSignatureLabel, type SignatureKey } from '../../data/signatureNames'
+import { trackDownload } from '../../utils/track'
 
 const SIGNATURES = [
   { key: 'areaEngineer' as const, label: 'Area Engineer' },
@@ -170,7 +171,7 @@ export default function TechnicalInvestigationReportForm() {
     signatures,
   })
 
-  const handleDownloadDocx = () => downloadDocx(buildReportData())
+  const handleDownloadDocx = () => { trackDownload('docx'); return downloadDocx(buildReportData()) }
 
   return (
     <>
@@ -270,7 +271,7 @@ export default function TechnicalInvestigationReportForm() {
       </div>
 
       <div className="no-print action-buttons">
-        <button className="print-pdf-btn" onClick={() => window.print()}>Print to PDF</button>
+        <button className="print-pdf-btn" onClick={() => { trackDownload('pdf'); window.print() }}>Print to PDF</button>
         <button className="print-pdf-btn" onClick={handleDownloadDocx}>Download DOCX</button>
       </div>
     </>

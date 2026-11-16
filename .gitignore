@@ -3,3 +3,6 @@ dist/
 *.local
 .env
 WhatsApp Image*.jpeg
+
+# analytics
+analytics/*.db*

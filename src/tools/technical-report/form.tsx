@@ -3,6 +3,7 @@ import { downloadDocx } from './docx-builder'
 import { normalizeImage } from '../../utils/normalizeImage'
 import type { DamageData, ReportData, SignatureData } from './report-types'
 import { SIGNATURE_NAMES, resolveSignatureLabel, type SignatureKey } from '../../data/signatureNames'
+import { trackDownload } from '../../utils/track'
 
 const TYRES = [
   { key: 'FrontRhs'  as const, label: 'Front RHS' },
@@ -279,7 +280,7 @@ export default function TotalLossReportForm() {
     signatures,
   })
 
-  const handleDownloadDocx = () => downloadDocx(buildReportData())
+  const handleDownloadDocx = () => { trackDownload('docx'); return downloadDocx(buildReportData()) }
 
   return (
     <>
@@ -462,7 +463,7 @@ export default function TotalLossReportForm() {
       </div>
 
       <div className="no-print action-buttons">
-        <button className="print-pdf-btn" onClick={() => window.print()}>Print to PDF</button>
+        <button className="print-pdf-btn" onClick={() => { trackDownload('pdf'); window.print() }}>Print to PDF</button>
         <button className="print-pdf-btn" onClick={handleDownloadDocx}>Download DOCX</button>
       </div>
     </>

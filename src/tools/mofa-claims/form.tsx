@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { normalizeImage } from '../../utils/normalizeImage'
 import { downloadDocx } from './docx-builder'
 import type { ReportData, SignOff, ClosingSignOff } from './report-types'
+import { trackDownload } from '../../utils/track'
 
 function formatCurrencyDisplay(raw: string): string {
   if (!raw) return ''
@@ -188,11 +189,12 @@ export default function MofaClaimsForm() {
   const handlePrintPDF = () => {
     const prev = document.title
     document.title = vehicleNo || 'mofa-claims'
+    trackDownload('pdf')
     window.print()
     document.title = prev
   }
 
-  const handleDownloadDocx = () => downloadDocx(buildReportData(), filename)
+  const handleDownloadDocx = () => { trackDownload('docx'); return downloadDocx(buildReportData(), filename) }
 
   return (
     <>

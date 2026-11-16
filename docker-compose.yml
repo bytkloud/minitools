@@ -3,4 +3,20 @@ services:
     build: .
     ports:
       - "8080:80"
+    depends_on:
+      - analytics
     restart: unless-stopped
+  analytics:
+    build: ./analytics
+    ports:
+      - "127.0.0.1:8081:8081"
+    environment:
+      STATS_USER: ${STATS_USER:-admin}
+      STATS_PASSWORD: ${STATS_PASSWORD:?set STATS_PASSWORD in .env}
+      STATS_SECRET: ${STATS_SECRET:?set STATS_SECRET in .env}
+      STATS_TZ: ${STATS_TZ:-UTC}
+    volumes:
+      - stats-data:/data
+    restart: unless-stopped
+volumes:
+  stats-data:

@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { normalizeImage } from '../../utils/normalizeImage'
 import { downloadDocx } from './docx-builder'
 import type { ChecklistItem, CustomChecklistItem, PersonContact, PhotoSectionKey, ReportData } from './report-types'
+import { trackDownload } from '../../utils/track'
 
 const CHECKLIST_DEFAULTS: ChecklistItem[] = [
   { id: 'usage', label: 'Usage of vehicle', checked: false },
@@ -222,11 +223,12 @@ export default function InvestigationRequestForm() {
   const handlePrintPDF = () => {
     const prev = document.title
     document.title = vehicleNo || 'investigation-request'
+    trackDownload('pdf')
     window.print()
     document.title = prev
   }
 
-  const handleDownloadDocx = () => downloadDocx(buildReportData(), filename)
+  const handleDownloadDocx = () => { trackDownload('docx'); return downloadDocx(buildReportData(), filename) }
 
   return (
     <>

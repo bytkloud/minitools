@@ -3,6 +3,7 @@ import { normalizeImage } from '../../utils/normalizeImage'
 import { downloadDocx } from './docx-builder'
 import type { ReportData, SignatureData } from './report-types'
 import { SIGNATURE_NAMES, resolveSignatureLabel, type SignatureKey } from '../../data/signatureNames'
+import { trackDownload } from '../../utils/track'
 
 const SIGNATURES = [
   { key: 'areaEngineer'   as const, nameKey: 'areaEngineer'  as const, label: 'Area Engineer' },
@@ -377,11 +378,12 @@ export default function MofaForm() {
   const handlePrintPDF = () => {
     const prev = document.title
     document.title = vehicleNo || 'mofa'
+    trackDownload('pdf')
     window.print()
     document.title = prev
   }
 
-  const handleDownloadDocx = () => downloadDocx(buildReportData(), filename)
+  const handleDownloadDocx = () => { trackDownload('docx'); return downloadDocx(buildReportData(), filename) }
 
 
   return (
