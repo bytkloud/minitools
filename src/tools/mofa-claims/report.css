@@ -346,7 +346,7 @@ table.mc-people-table input[type='text'] {
 @media print {
   @page {
     size: A4;
-    margin: 10mm 14mm;
+    margin: 10mm 14mm 16mm;
   }
 
   .mc-root {

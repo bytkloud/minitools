@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+/* Branding footer on every printed page (keep in sync with src/utils/docxBranding.ts) */
+@page {
+  @bottom-center {
+    content: "Pioneered by Kasun@R\A Technical Contact - chaturajd@gmail.com";
+    white-space: pre;
+    font-family: Calibri, Carlito, Arial, sans-serif;
+    font-size: 8pt;
+    color: #808080;
+    text-align: center;
+  }
+}
