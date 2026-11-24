@@ -45,6 +45,7 @@ export interface ReportData {
 
   // Consultant engineer's comment (blank → ruled lines for hand-writing)
   consultantComment: string
+  consultantSignature: SignatureData
 
   // Signatures
   signatures: {

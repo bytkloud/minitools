@@ -183,16 +183,10 @@ function buildTyreTable(tyres: ReportData['tyres']): Table {
   })
 }
 
-function buildSignaturesTable(sigs: ReportData['signatures']): Table {
-  const entries: [string, SignatureData][] = [
-    [resolveSignatureLabel('areaEngineer', sigs.areaEngineer.name, 'Area Engineer'), sigs.areaEngineer],
-    ['Zonal Engineer 1',       sigs.zonalEngineer1],
-    ['Zonal Engineer 2',       sigs.zonalEngineer2],
-    ['Manager Motor Engineer', sigs.managerMotor],
-  ]
-
+function buildSignaturesTable(entries: [string, SignatureData][]): Table {
   return new Table({
-    width: { size: 100, type: WidthType.PERCENTAGE },
+    width: { size: entries.length === 1 ? 25 : 100, type: WidthType.PERCENTAGE },
+    alignment: AlignmentType.RIGHT,
     borders: BORDERS_NONE,
     rows: [
       // Label row
@@ -204,6 +198,7 @@ function buildSignaturesTable(sigs: ReportData['signatures']): Table {
               children: [run(label, { bold: true, size: 20 })],
               alignment: AlignmentType.CENTER,
               spacing: { after: 80 },
+              keepNext: true,
             })],
           })
         ),
@@ -223,8 +218,9 @@ function buildSignaturesTable(sigs: ReportData['signatures']): Table {
                       type: imgType(sig.imageSrc),
                     })],
                     alignment: AlignmentType.CENTER,
+                    keepNext: true,
                   })
-                : new Paragraph({ children: [run(' ', { size: 48 })] }),
+                : new Paragraph({ children: [run(' ', { size: 48 })], keepNext: true }),
             ],
           })
         ),
@@ -238,6 +234,7 @@ function buildSignaturesTable(sigs: ReportData['signatures']): Table {
               children: [run(sig.name || ' ', { bold: true, size: 20 })],
               alignment: AlignmentType.CENTER,
               spacing: { before: 40 },
+              keepNext: true,
             })],
           })
         ),
@@ -392,16 +389,26 @@ async function buildDocx(data: ReportData): Promise<Blob> {
       ? [new Paragraph({ spacing: { before: 200 } }), bodyParagraph(data.notes.trim())]
       : []),
 
+    sectionHeading('Signatures'),
+    buildSignaturesTable([
+      [resolveSignatureLabel('areaEngineer', data.signatures.areaEngineer.name, 'Area Engineer'), data.signatures.areaEngineer],
+      ['Zonal Engineer 1',       data.signatures.zonalEngineer1],
+      ['Zonal Engineer 2',       data.signatures.zonalEngineer2],
+    ]),
+
     sectionHeading("Consultant Engineer's Comment"),
     ...(data.consultantComment.trim()
       ? [bodyParagraph(data.consultantComment.trim())]
       : [1, 2, 3].map(() => new Paragraph({
           spacing: { before: 360 },
           border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: '000000', space: 1 } },
+          keepNext: true,
         }))),
+    new Paragraph({ spacing: { before: 200 }, keepNext: true }),
+    buildSignaturesTable([['Consultant Engineer', data.consultantSignature]]),
 
-    sectionHeading('Signatures'),
-    buildSignaturesTable(data.signatures),
+    sectionHeading('Manager Motor Engineer Approval'),
+    buildSignaturesTable([['Manager Motor Engineer', data.signatures.managerMotor]]),
 
     ...(data.showSavingDetails
       ? [new Paragraph({ spacing: { before: 300 } }), buildSavingDetailsBox(data)]

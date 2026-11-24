@@ -6,7 +6,7 @@
 //
 // Fill in the names per title as needed.
 
-export type SignatureKey = 'areaEngineer' | 'zonalEngineer' | 'managerMotor'
+export type SignatureKey = 'areaEngineer' | 'zonalEngineer' | 'managerMotor' | 'consultantEngineer'
 
 // Assistant Area Engineers are substitutes for the Area Engineer — they can
 // sign wherever an Area Engineer signature is required, but the printed
@@ -25,18 +25,20 @@ export const SIGNATURE_NAMES: Record<SignatureKey, string[]> = {
     "Asanka Gimhan",
     "Janitha Kasun",
     "Sewwanda Nadeeshan",
-    "Prasanna Ekanayake",
     "Noyel Sampath",
     "Mahendra Saumyan",
     ...ASSISTANT_AREA_ENGINEER_NAMES,
   ],
   zonalEngineer: [
-    "Kasun Rathnayake",
+    "Prasanna Ekanayake",
     "Suranjan Jayasundara",
     "Jayantha Dissanayake"
   ],
   managerMotor: [
     "Kosala Abeysinghe"
+  ],
+  consultantEngineer: [
+    "Nihal Nandasiri"
   ],
 }
 

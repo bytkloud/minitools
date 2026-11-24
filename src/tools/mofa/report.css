@@ -472,6 +472,14 @@
   text-align: center;
 }
 
+.signature-section-single {
+  justify-content: flex-end;
+}
+
+.signature-section-single .signature-box {
+  flex: 0 0 calc((100% - 3rem) / 4);
+}
+
 .signature-box .sig-label {
   font-size: 0.8rem;
   font-weight: 600;

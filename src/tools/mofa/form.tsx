@@ -9,7 +9,6 @@ const SIGNATURES = [
   { key: 'areaEngineer'   as const, nameKey: 'areaEngineer'  as const, label: 'Area Engineer' },
   { key: 'zonalEngineer1' as const, nameKey: 'zonalEngineer' as const, label: 'Zonal Engineer 1' },
   { key: 'zonalEngineer2' as const, nameKey: 'zonalEngineer' as const, label: 'Zonal Engineer 2' },
-  { key: 'managerMotor'   as const, nameKey: 'managerMotor'  as const, label: 'Manager Motor Engineer' },
 ]
 
 type SettlementBasis =
@@ -305,6 +304,7 @@ export default function MofaForm() {
 
   const [notes, setNotes] = useState('')
   const [consultantComment, setConsultantComment] = useState('')
+  const [consultantSignature, setConsultantSignature] = useState<SignatureData>({ imageSrc: null, name: '', date: '' })
   const [signatures, setSignatures] = useState<ReportData['signatures']>({
     areaEngineer:   { imageSrc: null, name: '', date: '' },
     zonalEngineer1: { imageSrc: null, name: '', date: '' },
@@ -365,6 +365,7 @@ export default function MofaForm() {
     tyres,
     notes,
     consultantComment,
+    consultantSignature,
     signatures,
     showSavingDetails,
     accidentDate,
@@ -625,6 +626,23 @@ export default function MofaForm() {
         {notes && <div className="mofa-notes-print print-only">{notes}</div>}
       </div>
 
+      {/* Signatures */}
+      <div className="section-break">
+        <h2>Signatures</h2>
+        <div className="signature-section">
+          {SIGNATURES.map(({ key, nameKey, label }) => (
+            <SignatureUpload
+              key={key}
+              label={label}
+              nameKey={nameKey}
+              listId={`sig-names-${key}`}
+              value={signatures[key]}
+              onChange={(data) => setSignatures((prev) => ({ ...prev, [key]: data }))}
+            />
+          ))}
+        </div>
+      </div>
+
       {/* Consultant engineer's comment */}
       <div className="section-break">
         <h2>Consultant Engineer's Comment</h2>
@@ -642,22 +660,28 @@ export default function MofaForm() {
             <div /><div /><div />
           </div>
         )}
+        <div className="signature-section signature-section-single">
+          <SignatureUpload
+            label="Consultant Engineer"
+            nameKey="consultantEngineer"
+            listId="sig-names-consultantEngineer"
+            value={consultantSignature}
+            onChange={setConsultantSignature}
+          />
+        </div>
       </div>
 
-      {/* Signatures */}
+      {/* Manager Motor Engineer approval */}
       <div className="section-break">
-        <h2>Signatures</h2>
-        <div className="signature-section">
-          {SIGNATURES.map(({ key, nameKey, label }) => (
-            <SignatureUpload
-              key={key}
-              label={label}
-              nameKey={nameKey}
-              listId={`sig-names-${key}`}
-              value={signatures[key]}
-              onChange={(data) => setSignatures((prev) => ({ ...prev, [key]: data }))}
-            />
-          ))}
+        <h2>Manager Motor Engineer Approval</h2>
+        <div className="signature-section signature-section-single">
+          <SignatureUpload
+            label="Manager Motor Engineer"
+            nameKey="managerMotor"
+            listId="sig-names-managerMotor"
+            value={signatures.managerMotor}
+            onChange={(data) => setSignatures((prev) => ({ ...prev, managerMotor: data }))}
+          />
         </div>
       </div>
 
