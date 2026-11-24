@@ -186,7 +186,7 @@ function buildTyreTable(tyres: ReportData['tyres']): Table {
 function buildSignaturesTable(entries: [string, SignatureData][]): Table {
   return new Table({
     width: { size: entries.length === 1 ? 25 : 100, type: WidthType.PERCENTAGE },
-    alignment: AlignmentType.RIGHT,
+    alignment: AlignmentType.LEFT,
     borders: BORDERS_NONE,
     rows: [
       // Label row

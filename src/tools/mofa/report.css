@@ -473,7 +473,7 @@
 }
 
 .signature-section-single {
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 .signature-section-single .signature-box {
