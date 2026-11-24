@@ -3,7 +3,6 @@ import {
   BorderStyle,
   Document,
   ImageRun,
-  Packer,
   Paragraph,
   ShadingType,
   Table,
@@ -12,6 +11,7 @@ import {
   TextRun,
   WidthType,
 } from 'docx'
+import { brandingFooter, packDocx } from '../../utils/docxBranding'
 import type { PersonContact, PhotoSectionKey, ReportData } from './report-types'
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
@@ -252,6 +252,7 @@ export async function downloadDocx(
       },
     },
     sections: [{
+      footers: brandingFooter(),
       properties: {
         page: { margin: { top: 1440, bottom: 1440, left: 1800, right: 1440 } },
       },
@@ -282,7 +283,7 @@ export async function downloadDocx(
     }],
   })
 
-  const blob = await Packer.toBlob(doc)
+  const blob = await packDocx(doc)
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url

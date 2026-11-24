@@ -3,7 +3,6 @@ import {
   BorderStyle,
   Document,
   ImageRun,
-  Packer,
   Paragraph,
   ShadingType,
   Table,
@@ -12,6 +11,7 @@ import {
   TextRun,
   WidthType,
 } from 'docx'
+import { brandingFooter, packDocx } from '../../utils/docxBranding'
 import type { ReportData, SignatureData } from './report-types'
 import { resolveSignatureLabel } from '../../data/signatureNames'
 
@@ -419,6 +419,7 @@ async function buildDocx(data: ReportData): Promise<Blob> {
       },
     },
     sections: [{
+      footers: brandingFooter(),
       properties: {
         page: { margin: { top: 1440, bottom: 1440, left: 1800, right: 1440 } },
       },
@@ -426,7 +427,7 @@ async function buildDocx(data: ReportData): Promise<Blob> {
     }],
   })
 
-  return Packer.toBlob(doc)
+  return packDocx(doc)
 }
 
 export async function buildDocxBlob(data: ReportData): Promise<Blob> {
