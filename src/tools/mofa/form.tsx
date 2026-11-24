@@ -304,6 +304,7 @@ export default function MofaForm() {
 
   const [notes, setNotes] = useState('')
   const [consultantComment, setConsultantComment] = useState('')
+  const [acrJustification, setAcrJustification] = useState('')
   const [consultantSignature, setConsultantSignature] = useState<SignatureData>({ imageSrc: null, name: '', date: '' })
   const [signatures, setSignatures] = useState<ReportData['signatures']>({
     areaEngineer:   { imageSrc: null, name: '', date: '' },
@@ -366,6 +367,7 @@ export default function MofaForm() {
     notes,
     consultantComment,
     consultantSignature,
+    acrJustification,
     signatures,
     showSavingDetails,
     accidentDate,
@@ -740,6 +742,25 @@ export default function MofaForm() {
           </div>
         </div>
       )}
+
+      {/* ACR justification */}
+      <div className="section-break">
+        <h2>ACR Justification (if necessary)</h2>
+        <textarea
+          className="report-textarea no-print"
+          rows={3}
+          value={acrJustification}
+          onChange={(e) => setAcrJustification(e.target.value)}
+          placeholder="Type a justification, or leave empty to hand-write after printing..."
+        />
+        {acrJustification.trim() ? (
+          <div className="mofa-notes-print print-only">{acrJustification}</div>
+        ) : (
+          <div className="mofa-comment-lines print-only">
+            <div /><div /><div />
+          </div>
+        )}
+      </div>
 
       <div className="no-print action-buttons">
         <button className="print-pdf-btn" onClick={handlePrintPDF}>

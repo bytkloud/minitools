@@ -413,6 +413,15 @@ async function buildDocx(data: ReportData): Promise<Blob> {
     ...(data.showSavingDetails
       ? [new Paragraph({ spacing: { before: 300 } }), buildSavingDetailsBox(data)]
       : []),
+
+    sectionHeading('ACR Justification (if necessary)'),
+    ...(data.acrJustification.trim()
+      ? [bodyParagraph(data.acrJustification.trim())]
+      : [1, 2, 3].map(() => new Paragraph({
+          spacing: { before: 360 },
+          border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: '000000', space: 1 } },
+          keepNext: true,
+        }))),
   ]
 
   const doc = new Document({

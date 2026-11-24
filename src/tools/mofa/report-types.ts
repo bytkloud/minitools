@@ -47,6 +47,9 @@ export interface ReportData {
   consultantComment: string
   consultantSignature: SignatureData
 
+  // ACR justification (blank → ruled lines for hand-writing)
+  acrJustification: string
+
   // Signatures
   signatures: {
     areaEngineer: SignatureData
