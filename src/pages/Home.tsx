@@ -27,6 +27,13 @@ const tools: { name: string; description: string; path: string; icon: typeof Cal
     category: 'Engineering',
   },
   {
+    name: 'Orient Total Loss',
+    description: 'Orient vehicle total loss report form with photos and signatures',
+    path: '/orient-total-loss',
+    icon: FileText,
+    category: 'Engineering',
+  },
+  {
     name: 'Technical Investigation Report',
     description: 'Vehicle technical investigation report form',
     path: '/technical-investigation-report',

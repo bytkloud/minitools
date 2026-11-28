@@ -5,7 +5,8 @@ import Home from './pages/Home'
 
 const InsuranceCalc = lazy(() => import('./tools/insurance-calc'))
 const TechnicalReport = lazy(() => import('./tools/technical-report'))
-const TechnicalInvestigationReport = lazy(() => import('./tools/technical-investigation-report'))
+const OrientTotalLoss = lazy(() => import('./tools/orient-total-loss'))
+const TechnicalInvestigationReport =lazy(() => import('./tools/technical-investigation-report'))
 const Mofa = lazy(() => import('./tools/mofa'))
 const MofaClaims = lazy(() => import('./tools/mofa-claims'))
 const InvestigationRequest = lazy(() => import('./tools/investigation-request'))
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/insurance-calc" element={<InsuranceCalc />} />
           <Route path="/technical-report" element={<TechnicalReport />} />
+          <Route path="/orient-total-loss" element={<OrientTotalLoss />} />
           <Route path="/technical-investigation-report" element={<TechnicalInvestigationReport />} />
           <Route path="/mofa" element={<Mofa />} />
           <Route path="/mofa-claims" element={<MofaClaims />} />
